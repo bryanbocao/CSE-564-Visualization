@@ -22,6 +22,16 @@ https://www.w3schools.com
   <!--  <script src="../d3.min.js"></script> Use D3 library from CDN -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
     <script src="https://d3js.org/d3.v4.min.js"></script>
+
+    <style>
+    .bar {
+      fill: orange;
+    }
+
+    .bar:hover {
+      fill: orangered ;
+    }
+    </style>
 </head>
 <body>
 
@@ -116,7 +126,7 @@ https://www.w3schools.com
                                 .domain([y_min, y_max])
                                 .range(color_range);
 
-            var bar_w = x(hist[0].x1) - x(hist[0].x0) - 30,
+            var bar_w = x(hist[0].x1) - x(hist[0].x0) - 50,
                 bar_h = function(d) { return svg_h - y(d.length)},
                 bar_c = function(d) { return color_scale(d.length)}, // bar color
                 bar_t = function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")";}; // bar transform
@@ -132,7 +142,23 @@ https://www.w3schools.com
                 .attr("x", 1)
                 .attr("width", bar_w)
                 .attr("height", bar_h)
-                .attr("fill", bar_c);
+                .attr("fill", bar_c)
+                .on('mouseover', function(d){
+                    d3.select(this)
+                      .transition()
+                      .duration(500)
+                      .attr("x", 1)
+                      .attr("width", bar_w + 30)
+                      .attr("height", 2000)
+                })
+                .on("mouseout", function(d){
+                      d3.select(this)
+                          .transition()
+                          .duration(500)
+                          .attr("x", 1)
+                          .attr("width", bar_w)
+                          .attr("height", bar_h);
+                });
 
             bar.select("rect")
                 .transition()
@@ -147,7 +173,7 @@ https://www.w3schools.com
 
             bar.select("rect")
                 .transition()
-                .duration(1000)
+                .duration(500)
                 .attr("width", bar_w)
                 .attr("height", bar_h)
                 .attr("fill", bar_c);
@@ -204,14 +230,14 @@ https://www.w3schools.com
                 bar_t = function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")";}; // bar transform
 
             bar.transition()
-                .duration(1000)
+                .duration(500)
                 .attr("transform", bar_t);
 
             console.log(display_data_values)
 
             bar.select("rect")
                 .transition()
-                .duration(1000)
+                .duration(500)
                 .attr("width", bar_w)
                 .attr("height", bar_h)
                 .attr("fill", bar_c);
