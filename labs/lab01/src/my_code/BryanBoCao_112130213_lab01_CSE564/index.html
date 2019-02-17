@@ -44,8 +44,6 @@ https://www.w3schools.com
     <h2>Student: Bryan Bo Cao SBU ID: 112130213</h2>
     <hr>
     <p>Dataset: College 777 data points, 18 dimensions</p>
-
-
     <div id="dropdown_div">
       Select Attribute:
     </div>
@@ -56,12 +54,13 @@ https://www.w3schools.com
     <div id="value_on_bar" class="hidden">
       <p><span id="value"></span></p>
     </div>
-    <div id="canvas" onmousemove="check_lr_movement(event)">
+    <div id="canvas" onmousemove="check_lr_movement(event)" onclick="change_chart()">
       <!-- Note that check_lr_movement(event)" is for the requirement of
       7.mouse moves left (right) should decrease (increase) bin width/size -->
       <!-- To canvas div for d3 -->
-      <svg width="960" height="500"></svg>
-
+      <div id="barchart">
+        <svg id="barchart_svg" width="960" height="500"></svg>
+      </div>
     </div>
 
     <div id="canvas_script">
@@ -78,6 +77,10 @@ https://www.w3schools.com
         var format_count = d3.format(",.0f");
         var margin = 20;
         var hist;
+        var svg = d3.select("#barchart_svg");
+        var svg_w = svg.attr("width") - margin;
+            svg_h = svg.attr("height") - margin;
+        var bar_change_direction = true;
 
         d3.csv("./data/College.csv", function(data) {
 
@@ -99,11 +102,6 @@ https://www.w3schools.com
           function init_barchart(display_data_values) {
 
             console.log("init_barchart()");
-
-            var format_count = d3.format(",.0f");
-            var svg = d3.select("svg");
-            var svg_w = svg.attr("width") - margin;
-                svg_h = svg.attr("height") - margin;
             var g = svg.append("g")
                         .attr("transform", "translate(" + margin + ")");
 
@@ -221,17 +219,16 @@ https://www.w3schools.com
                 .attr("height", bar_h)
                 .attr("fill", bar_c);
 
+            d3.select("#canvas")
+                .append("div")
+                .attr("id", "piechart_svg")
+                .attr("transform", "translate(-1000, 0)");
+
           } // end of function init_barchart(display_data_values)
 
           function update_barchart(display_data_values) {
 
             console.log("update_barchart()");
-
-            var format_count = d3.format(",.0f");
-            var svg = d3.select("svg");
-            var svg_w = svg.attr("width") - margin,
-                svg_h = svg.attr("height") - margin;
-
             var x_min = d3.min(display_data_values),
                 x_max = d3.max(display_data_values),
                 x_range = [0, svg_w],
@@ -329,7 +326,7 @@ https://www.w3schools.com
         // for 7.mouse moves left (right) should decrease (increase) bin width/size
         function check_lr_movement(event) {
 
-          var bar = d3.select("svg")
+          var bar = d3.select("#barchart_svg")
                       .selectAll(".bar");
           var bar_w = bar.select("rect")
                           .attr("width");
@@ -355,6 +352,32 @@ https://www.w3schools.com
         function reset_check_lr_movement() {
           d3.select("#canvas")
             .attr("onmousemove", "check_lr_movement(event)");
+        }
+
+        function change_chart() {
+            console.log("change_chart!");
+            if (bar_change_direction) {
+              d3.select("#barchart_svg")
+                .transition()
+                .duration(500)
+                .attr("transform", "translate(-1000, 0)");
+              d3.select("#piechart_svg")
+                .transition()
+                .duration(1000)
+                .attr("transform", "translate(0, 0)");
+              bar_change_direction = false;
+            } else {
+              d3.select("#piechart_svg")
+                .transition()
+                .duration(500)
+                .attr("transform", "translate(-1000, 0)");
+              d3.select("#barchart_svg")
+                .transition()
+                .duration(1000)
+                .attr("transform", "translate(0, 0)");
+              bar_change_direction = true;
+            }
+
         }
 
       </script>
