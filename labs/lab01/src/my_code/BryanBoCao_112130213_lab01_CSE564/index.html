@@ -56,7 +56,9 @@ https://www.w3schools.com
     <div id="value_on_bar" class="hidden">
       <p><span id="value"></span></p>
     </div>
-    <div id="canvas">
+    <div id="canvas" onmousemove="check_lr_movement(event)">
+      <!-- Note that check_lr_movement(event)" is for the requirement of
+      7.mouse moves left (right) should decrease (increase) bin width/size -->
       <!-- To canvas div for d3 -->
       <svg width="960" height="500"></svg>
 
@@ -67,11 +69,15 @@ https://www.w3schools.com
       <script>
 
         // parameters
+        var pre_mouse_x_pos = -1; // -1 means no previous mouse x position has been assigned
+        var curr_bar_w = -10; // initial value
         var w = window.innerWidth, h = window.innerHeight - 450;
         var canvas_w = w - 20, canvas_h = h - 320;
         var num_bin = 10;
         var my_colors = ["#003B46", "#07575B", "#66A5AD", "#C4DFE6"];
         var format_count = d3.format(",.0f");
+        var margin = 20;
+        var hist;
 
         d3.csv("./data/College.csv", function(data) {
 
@@ -96,7 +102,6 @@ https://www.w3schools.com
 
             var format_count = d3.format(",.0f");
             var svg = d3.select("svg");
-            var margin = 20;
             var svg_w = svg.attr("width") - margin;
                 svg_h = svg.attr("height") - margin;
             var g = svg.append("g")
@@ -213,8 +218,7 @@ https://www.w3schools.com
 
             var format_count = d3.format(",.0f");
             var svg = d3.select("svg");
-            var margin = 20;
-            var svg_w = svg.attr("width") - margin;
+            var svg_w = svg.attr("width") - margin,
                 svg_h = svg.attr("height") - margin;
 
             var x_min = d3.min(display_data_values),
@@ -283,6 +287,8 @@ https://www.w3schools.com
                 .attr("transform", "translate(0," + svg_h + ")")
                 .call(d3.axisBottom(x));
 
+            curr_bar_w = bar_w;
+
             bar.exit().remove();
           } // end of function render_barchart(values)
 
@@ -307,7 +313,31 @@ https://www.w3schools.com
               update_barchart(display_data);
           });
 
-        }) // end of d3.csv("./data/College.csv", function(data) {
+        }) // end of d3.csv("./data/College.csv", function(data)
+
+
+        // for 7.mouse moves left (right) should decrease (increase) bin width/size
+        function check_lr_movement(event) {
+          if (pre_mouse_x_pos > 0) {
+            var svg = d3.select("svg");
+            var bar = svg.selectAll(".bar");
+            var bar_w = bar.attr("width") - margin;
+            if (curr_bar_w == -10) curr_bar_w = bar_w;
+            if (pre_mouse_x_pos < event.clientX) {
+              // move right to make bars thinner
+              curr_bar_w--;
+            } else {
+              // move left to make bars thicker
+              curr_bar_w++;
+            }
+            if (curr_bar_w <= 0) curr_bar_w = 1
+            bar.selectAll("rect")
+                .transition()
+                .duration(0)
+                .attr("width", curr_bar_w);
+          }
+          pre_mouse_x_pos = event.clientX;
+        }
 
       </script>
     </div>
