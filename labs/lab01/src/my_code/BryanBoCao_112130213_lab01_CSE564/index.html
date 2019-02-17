@@ -29,6 +29,15 @@ https://www.w3schools.com
     <h2>Student: Bryan Bo Cao SBU ID: 112130213</h2>
     <hr>
     <p>Dataset: College 777 data points, 18 dimensions</p>
+
+
+    <div id="dropdown_div">
+      Select Attribute:
+      <!-- <select id="dropdown_menu">
+      		<option id="select_attribute" selected="selected" value="Private">Private</option>
+      </select> -->
+    </div>
+
   </div>
 
   <div class="container-fluid well">
@@ -45,7 +54,7 @@ https://www.w3schools.com
         // parameters
         var w = window.innerWidth, h = window.innerHeight - 450;
         var canvas_w = w - 20, canvas_h = h - 320;
-        var num_bin = 15;
+        var num_bin = 10;
         var my_colors = ["#003B46", "#07575B", "#66A5AD", "#C4DFE6"];
         var format_count = d3.format(",.0f");
 
@@ -56,10 +65,17 @@ https://www.w3schools.com
           attributes.shift(); // clean data
           console.log(attributes)
 
+          // fill the dropdown menu by data attribute names
+          var select = document.getElementById("dropdown_menu");
+          // for (index in attributes4dropdown) {
+          //     select.options[select.options.length] = new Option(attributes4dropdown[index], index);
+          // }
+
           console.log(attributes.length)
-          var attribute = attributes[4];
+          var attribute = attributes[0];
           console.log(attribute)
 
+          var attribute = attributes[parseInt(attributes.length * Math.random())];
           var display_data = data.map(function(d) { return parseInt(d[attribute])});
           console.log(display_data)
 
@@ -68,25 +84,9 @@ https://www.w3schools.com
                           .attr("width", canvas_w)
                           .attr("height", canvas_h);
 
-          // // Testing display rect
-          // var rect = canvas.append("rect")
-          //                   .attr("width", 20)
-          //                   .attr("height", 20)
-          //                   .attr("fill", "red");
-          //
-          // // Previous attempt
-          // var display_data = [];
-          // for (var i = 0; i < data.length; i++) {
-          //   display_data.push(data[i].Accept)
-          // }
-          //
-          // // Testing
-          // for (var i = 0; i < data.length; i++) {
-          //   console.log(data[i].Accept);
-          //   console.log(data[i].Enroll);
-          // }
+          function init_barchart(display_data_values) {
 
-          function render_barchart(display_data_values) {
+            console.log("init_barchart()");
 
             var format_count = d3.format(",.0f");
             var svg = d3.select("svg");
@@ -96,8 +96,8 @@ https://www.w3schools.com
             var g = svg.append("g")
                         .attr("transform", "translate(" + padding + ")");
 
-            var x_min = d3.min(display_data),
-                x_max = d3.max(display_data),
+            var x_min = d3.min(display_data_values),
+                x_max = d3.max(display_data_values),
                 x_range = [0, svg_w],
                 x_domain = [0, x_max];
 
@@ -119,11 +119,13 @@ https://www.w3schools.com
                       .range(y_range)
                       .domain(y_domain);
 
+            var color_range = [d3.rgb(my_colors[0]),
+                                d3.rgb(my_colors[2])];
             var color_scale = d3.scaleLinear()
                                 .domain([y_min, y_max])
-                                .range([d3.rgb("#66A5AD"), d3.rgb("#003B46")]);
+                                .range(color_range);
 
-            var bar_w = x(hist[0].x1) - x(hist[0].x0) - 12,
+            var bar_w = x(hist[0].x1) - x(hist[0].x0) - 30,
                 bar_h = function(d) { return svg_h - y(d.length)},
                 bar_c = function(d) { return color_scale(d.length)}, // bar color
                 bar_t = function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")";}; // bar transform
@@ -141,15 +143,113 @@ https://www.w3schools.com
                 .attr("height", bar_h)
                 .attr("fill", bar_c);
 
-            g.append("g")
+            bar.select("rect")
+                .transition()
+                .duration(0)
+                .attr("width", bar_w)
+                .attr("height", 0);
+
+            svg.append("g")
+                .attr("class", "xaxis")
                 .attr("transform", "translate(0," + svg_h + ")")
                 .call(d3.axisBottom(x));
 
+            bar.select("rect")
+                .transition()
+                .duration(1000)
+                .attr("width", bar_w)
+                .attr("height", bar_h)
+                .attr("fill", bar_c);
+
+          } // end of function init_barchart(display_data_values)
+
+          function update_barchart(display_data_values) {
+
+            console.log("update_barchart()");
+
+            var format_count = d3.format(",.0f");
+            var svg = d3.select("svg");
+            var padding = 20;
+            var svg_w = svg.attr("width") - padding;
+                svg_h = svg.attr("height") - padding;
+
+            var x_min = d3.min(display_data_values),
+                x_max = d3.max(display_data_values),
+                x_range = [0, svg_w],
+                x_domain = [0, x_max];
+
+            var x = d3.scaleLinear()
+                      .range(x_range)
+              				.domain(x_domain);
+
+            var hist = d3.histogram()
+                          .domain(x_domain)
+                          .thresholds(x.ticks(num_bin))
+                          (display_data_values);
+
+            var y_min = d3.min(hist, function(d) { return d.length; }),
+                y_max = d3.max(hist, function(d) { return d.length; }),
+                y_range = [svg_h, 0],
+                y_domain = [0, y_max];
+
+            var y = d3.scaleLinear()
+                      .range(y_range)
+                      .domain(y_domain);
+
+            var bar = svg.selectAll(".bar").data(hist);
+
+            // Remove old data
+            bar.exit().remove();
+
+            var color_range = [d3.rgb(my_colors[0]),
+                                d3.rgb(my_colors[2])];
+            var color_scale = d3.scaleLinear()
+                                .domain([y_min, y_max])
+                                .range(color_range);
+
+            var bar_w = x(hist[0].x1) - x(hist[0].x0) - 12,
+                bar_h = function(d) { return svg_h - y(d.length)},
+                bar_c = function(d) { return color_scale(d.length)}, // bar color
+                bar_t = function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")";}; // bar transform
+
+            bar.transition()
+                .duration(1000)
+                .attr("transform", bar_t);
+
+            console.log(display_data_values)
+
+            bar.select("rect")
+                .transition()
+                .duration(1000)
+                .attr("width", bar_w)
+                .attr("height", bar_h)
+                .attr("fill", bar_c);
+
+            // update x axis
+            d3.selectAll(".xaxis").remove();
+            svg.append("g")
+                .attr("class", "xaxis")
+                .attr("transform", "translate(0," + svg_h + ")")
+                .call(d3.axisBottom(x));
+
+            bar.exit().remove();
           } // end of function render_barchart(values)
 
-          render_barchart(display_data);
+          init_barchart(display_data);
+
+          // Call update_barchart to test update charts
+          setInterval(function() {
+            var attribute = attributes[parseInt(attributes.length * Math.random())];
+            var display_data = data.map(function(d) { return parseInt(d[attribute])});
+            update_barchart(display_data);
+          }, 2000);
+
+          // Create a dropdown
+          var dropdown_menu = d3.select("#dropdown_div");
 
         }) // end of d3.csv("./data/College.csv", function(data) {
+
+
 
       </script>
     </div>
