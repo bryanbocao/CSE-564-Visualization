@@ -58,7 +58,7 @@ https://www.w3schools.com
       <!-- Note that check_lr_movement(event)" is for the requirement of
       7.mouse moves left (right) should decrease (increase) bin width/size -->
       <!-- To canvas div for d3 -->
-      <div id="barchart">
+      <div id="chart_div_id">
         <svg id="barchart_svg" width="960" height="500"></svg>
       </div>
     </div>
@@ -66,7 +66,6 @@ https://www.w3schools.com
     <div id="canvas_script">
 
       <script>
-
         // parameters
         var pre_mouse_x_pos = -1; // -1 means no previous mouse x position has been assigned
         var curr_bar_w = -10; // initial value
@@ -220,9 +219,11 @@ https://www.w3schools.com
                 .attr("fill", bar_c);
 
             d3.select("#canvas")
-                .append("div")
+                .append("svg")
                 .attr("id", "piechart_svg")
-                .attr("transform", "translate(-1000, 0)");
+                .attr("width", "0")
+                .attr("height", "0")
+                .attr("transform", "translate(0, 0)");
 
           } // end of function init_barchart(display_data_values)
 
@@ -298,9 +299,15 @@ https://www.w3schools.com
             curr_bar_w = bar_w;
 
             bar.exit().remove();
-          } // end of function render_barchart(values)
+          } // end of function update_barchart(display_data_values)
+
+          function init_piechart(display_data_values) {
+          
+
+          }
 
           init_barchart(display_data);
+          init_piechart(display_data);
 
           // Create a dropdown
           var dropdown_menu = d3.select("#dropdown_div");
@@ -360,21 +367,29 @@ https://www.w3schools.com
               d3.select("#barchart_svg")
                 .transition()
                 .duration(500)
-                .attr("transform", "translate(-1000, 0)");
+                .attr("width", "0")
+                .attr("height", "0")
+                // .attr("transform", "translate(-1000, 0)");
               d3.select("#piechart_svg")
                 .transition()
                 .duration(1000)
-                .attr("transform", "translate(0, 0)");
+                .attr("width", "500")
+                .attr("height", "960")
+                // .attr("transform", "translate(0, -300)");
               bar_change_direction = false;
             } else {
               d3.select("#piechart_svg")
                 .transition()
                 .duration(500)
-                .attr("transform", "translate(-1000, 0)");
+                .attr("width", "0")
+                .attr("height", "0")
+                // .attr("transform", "translate(-1000, -1000)");
               d3.select("#barchart_svg")
                 .transition()
                 .duration(1000)
-                .attr("transform", "translate(0, 0)");
+                .attr("width", "500")
+                .attr("height", "960")
+                // .attr("transform", "translate(0, 0)");
               bar_change_direction = true;
             }
 
