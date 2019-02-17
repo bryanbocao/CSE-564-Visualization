@@ -15,6 +15,7 @@ https://vincentarelbundock.github.io/Rdatasets/datasets.html
 
 Reference:
 https://getbootstrap.com/docs
+https://www.w3schools.com
 -->
 <html lang="en">
 <head>
@@ -25,24 +26,135 @@ https://getbootstrap.com/docs
 <body>
 
   <div class="page-header" align="center">
-    <h1>Student: Bryan Bo Cao SBU ID: 112130213</h1>
+    <h2>Student: Bryan Bo Cao SBU ID: 112130213</h2>
+    <hr>
+    <p>Dataset: College 777 data points, 18 dimensions</p>
   </div>
 
   <div class="container-fluid well">
 
-    <div class="dropup">
-
+    <div id="canvas">
+      <!-- To canvas div for d3 -->
+      <svg width="960" height="500"></svg>
     </div>
 
-    <div id="canvas">
+    <div id="canvas_script">
+
       <script>
+
+        // parameters
+        var w = window.innerWidth, h = window.innerHeight - 450;
+        var canvas_w = w - 20, canvas_h = h - 320;
+        var num_bin = 15;
+        var my_colors = ["#003B46", "#07575B", "#66A5AD", "#C4DFE6"];
+        var format_count = d3.format(",.0f");
+
+        d3.csv("./data/College.csv", function(data) {
+
+          var attributes = data.columns;
+          attributes.shift(); // The first attribute is "", so we need to remove it.
+          attributes.shift(); // clean data
+          console.log(attributes)
+
+          console.log(attributes.length)
+          var attribute = attributes[4];
+          console.log(attribute)
+
+          var display_data = data.map(function(d) { return parseInt(d[attribute])});
+          console.log(display_data)
+
+          var canvas = d3.select("#canvas")
+                          .append("svg")
+                          .attr("width", canvas_w)
+                          .attr("height", canvas_h);
+
+          // // Testing display rect
+          // var rect = canvas.append("rect")
+          //                   .attr("width", 20)
+          //                   .attr("height", 20)
+          //                   .attr("fill", "red");
+          //
+          // // Previous attempt
+          // var display_data = [];
+          // for (var i = 0; i < data.length; i++) {
+          //   display_data.push(data[i].Accept)
+          // }
+          //
+          // // Testing
+          // for (var i = 0; i < data.length; i++) {
+          //   console.log(data[i].Accept);
+          //   console.log(data[i].Enroll);
+          // }
+
+          function render_barchart(display_data_values) {
+
+            var format_count = d3.format(",.0f");
+            var svg = d3.select("svg");
+            var padding = 20;
+            var svg_w = svg.attr("width") - padding;
+                svg_h = svg.attr("height") - padding;
+            var g = svg.append("g")
+                        .attr("transform", "translate(" + padding + ")");
+
+            var x_min = d3.min(display_data),
+                x_max = d3.max(display_data),
+                x_range = [0, svg_w],
+                x_domain = [0, x_max];
+
+            var x = d3.scaleLinear()
+                      .range(x_range)
+              				.domain(x_domain);
+
+            var hist = d3.histogram()
+                          .domain(x_domain)
+                          .thresholds(x.ticks(num_bin))
+                          (display_data);
+
+            var y_min = d3.min(hist, function(d) { return d.length; }),
+                y_max = d3.max(hist, function(d) { return d.length; }),
+                y_range = [svg_h, 0],
+                y_domain = [0, y_max];
+
+            var y = d3.scaleLinear()
+                      .range(y_range)
+                      .domain(y_domain);
+
+            var color_scale = d3.scaleLinear()
+                                .domain([y_min, y_max])
+                                .range([d3.rgb("#66A5AD"), d3.rgb("#003B46")]);
+
+            var bar_w = x(hist[0].x1) - x(hist[0].x0) - 12,
+                bar_h = function(d) { return svg_h - y(d.length)},
+                bar_c = function(d) { return color_scale(d.length)}, // bar color
+                bar_t = function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")";}; // bar transform
+
+            var bar = g.selectAll(".bar")
+                .data(hist)
+                .enter()
+                .append("g")
+                .attr("class", "bar")
+                .attr("transform", bar_t);
+
+            bar.append("rect")
+                .attr("x", 1)
+                .attr("width", bar_w)
+                .attr("height", bar_h)
+                .attr("fill", bar_c);
+
+            g.append("g")
+                .attr("transform", "translate(0," + svg_h + ")")
+                .call(d3.axisBottom(x));
+
+          } // end of function render_barchart(values)
+
+          render_barchart(display_data);
+
+        }) // end of d3.csv("./data/College.csv", function(data) {
 
       </script>
     </div>
 
-
   </div>
-
 
 </body>
 </html>
