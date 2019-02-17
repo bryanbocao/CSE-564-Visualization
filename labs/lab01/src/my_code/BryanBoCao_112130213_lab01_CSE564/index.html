@@ -64,18 +64,9 @@ https://www.w3schools.com
           attributes.shift(); // The first attribute is "", so we need to remove it.
           attributes.shift(); // clean data
           console.log(attributes)
-
-          // fill the dropdown menu by data attribute names
-          var select = document.getElementById("dropdown_menu");
-          // for (index in attributes4dropdown) {
-          //     select.options[select.options.length] = new Option(attributes4dropdown[index], index);
-          // }
-
           console.log(attributes.length)
-          var attribute = attributes[0];
-          console.log(attribute)
 
-          var attribute = attributes[parseInt(attributes.length * Math.random())];
+          var attribute = attributes[0];
           var display_data = data.map(function(d) { return parseInt(d[attribute])});
           console.log(display_data)
 
@@ -237,19 +228,26 @@ https://www.w3schools.com
 
           init_barchart(display_data);
 
-          // Call update_barchart to test update charts
-          setInterval(function() {
-            var attribute = attributes[parseInt(attributes.length * Math.random())];
-            var display_data = data.map(function(d) { return parseInt(d[attribute])});
-            update_barchart(display_data);
-          }, 2000);
-
           // Create a dropdown
           var dropdown_menu = d3.select("#dropdown_div");
 
+          dropdown_menu.append("select")
+                      .attr("id", "dropdown_id")
+                      .selectAll("option")
+                          .data(attributes)
+                          .enter()
+                          .append("option")
+                          .attr("value", function(d){return d;})
+                          .text(function(d){return d;});
+
+          d3.select("select")
+            .on("change",function(d){
+              var attribute = d3.select("#dropdown_id").node().value;
+              var display_data = data.map(function(d) {return parseInt(d[attribute])});
+              update_barchart(display_data);
+          });
+
         }) // end of d3.csv("./data/College.csv", function(data) {
-
-
 
       </script>
     </div>
