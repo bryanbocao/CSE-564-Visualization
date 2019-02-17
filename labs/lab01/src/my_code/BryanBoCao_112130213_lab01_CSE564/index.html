@@ -19,9 +19,24 @@ https://www.w3schools.com
 -->
 <html lang="en">
 <head>
-  <!--  <script src="../d3.min.js"></script> Use D3 library from CDN -->
+    <!--  <script src="../d3.min.js"></script> Use D3 library from CDN -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
     <script src="https://d3js.org/d3.v4.min.js"></script>
+    <style>
+    #value_on_bar {
+      font-size: 20px;
+      background-color: #66A5AD;
+      padding: .30em;
+      color: white;
+      border-radius: 6px;
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .hidden {
+      display: none;
+    }
+    </style>
 </head>
 <body>
 
@@ -33,18 +48,18 @@ https://www.w3schools.com
 
     <div id="dropdown_div">
       Select Attribute:
-      <!-- <select id="dropdown_menu">
-      		<option id="select_attribute" selected="selected" value="Private">Private</option>
-      </select> -->
     </div>
 
   </div>
 
   <div class="container-fluid well">
-
+    <div id="value_on_bar" class="hidden">
+      <p><span id="value"></span></p>
+    </div>
     <div id="canvas">
       <!-- To canvas div for d3 -->
       <svg width="960" height="500"></svg>
+
     </div>
 
     <div id="canvas_script">
@@ -81,24 +96,24 @@ https://www.w3schools.com
 
             var format_count = d3.format(",.0f");
             var svg = d3.select("svg");
-            var padding = 20;
-            var svg_w = svg.attr("width") - padding;
-                svg_h = svg.attr("height") - padding;
+            var margin = 20;
+            var svg_w = svg.attr("width") - margin;
+                svg_h = svg.attr("height") - margin;
             var g = svg.append("g")
-                        .attr("transform", "translate(" + padding + ")");
+                        .attr("transform", "translate(" + margin + ")");
 
             var x_min = d3.min(display_data_values),
                 x_max = d3.max(display_data_values),
                 x_range = [0, svg_w],
                 x_domain = [0, x_max];
 
-            var x = d3.scaleLinear()
+            var x_scale = d3.scaleLinear()
                       .range(x_range)
               				.domain(x_domain);
 
             var hist = d3.histogram()
                           .domain(x_domain)
-                          .thresholds(x.ticks(num_bin))
+                          .thresholds(x_scale.ticks(num_bin))
                           (display_data);
 
             var y_min = d3.min(hist, function(d) { return d.length; }),
@@ -106,7 +121,7 @@ https://www.w3schools.com
                 y_range = [svg_h, 0],
                 y_domain = [0, y_max];
 
-            var y = d3.scaleLinear()
+            var y_scale = d3.scaleLinear()
                       .range(y_range)
                       .domain(y_domain);
 
@@ -116,10 +131,10 @@ https://www.w3schools.com
                                 .domain([y_min, y_max])
                                 .range(color_range);
 
-            var bar_w = x(hist[0].x1) - x(hist[0].x0) - 50,
-                bar_h = function(d) { return svg_h - y(d.length)},
+            var bar_w = x_scale(hist[0].x1) - x_scale(hist[0].x0) - 50,
+                bar_h = function(d) { return svg_h - y_scale(d.length)},
                 bar_c = function(d) { return color_scale(d.length)}, // bar color
-                bar_t = function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")";}; // bar transform
+                bar_t = function(d) { return "translate(" + x_scale(d.x0) + "," + y_scale(d.length) + ")";}; // bar transform
 
             var bar = g.selectAll(".bar")
                 .data(hist)
@@ -127,6 +142,14 @@ https://www.w3schools.com
                 .append("g")
                 .attr("class", "bar")
                 .attr("transform", bar_t);
+
+            bar.append("text")
+                .attr("dy", ".60em")
+                .attr("y", -12)
+                .attr("x", (x_scale(hist[0].x1) - x_scale(0)) / 2)
+                .attr("text-anchor", "middle")
+                .text("");
+                // .text(function(d) {return format_count(d.length);});
 
             bar.append("rect")
                 .attr("x", 1)
@@ -139,7 +162,20 @@ https://www.w3schools.com
                       .duration(500)
                       .attr("x", 1)
                       .attr("width", bar_w + 30)
-                      .attr("height", 2000)
+                      .attr("height", 2000);
+
+                    var value_x_pos = event.clientX,
+                        value_y_pos = svg_h - d3.select(this).attr("height") + 150;
+
+                		d3.select('#value_on_bar')
+                			.style('left', value_x_pos + 'px')
+                			.style('top', value_y_pos + 'px')
+                			.select('#value')
+                			.text(d.length);
+
+                		//Show the value_on_bar
+                		d3.select('#value_on_bar').classed('hidden', false);
+
                 })
                 .on("mouseout", function(d){
                       d3.select(this)
@@ -148,6 +184,7 @@ https://www.w3schools.com
                           .attr("x", 1)
                           .attr("width", bar_w)
                           .attr("height", bar_h);
+                      d3.select('#value_on_bar').classed('hidden', true);
                 });
 
             bar.select("rect")
@@ -156,17 +193,10 @@ https://www.w3schools.com
                 .attr("width", bar_w)
                 .attr("height", 0);
 
-            bar.append("text")
-                .attr("dy", ".60em")
-                .attr("y", -12)
-                .attr("x", (x(hist[0].x1) - x(0)) / 2)
-                .attr("text-anchor", "middle")
-                .text(function(d) {return format_count(d.length);});
-
             svg.append("g")
                 .attr("class", "xaxis")
                 .attr("transform", "translate(0," + svg_h + ")")
-                .call(d3.axisBottom(x));
+                .call(d3.axisBottom(x_scale));
 
             bar.select("rect")
                 .transition()
@@ -183,9 +213,9 @@ https://www.w3schools.com
 
             var format_count = d3.format(",.0f");
             var svg = d3.select("svg");
-            var padding = 20;
-            var svg_w = svg.attr("width") - padding;
-                svg_h = svg.attr("height") - padding;
+            var margin = 20;
+            var svg_w = svg.attr("width") - margin;
+                svg_h = svg.attr("height") - margin;
 
             var x_min = d3.min(display_data_values),
                 x_max = d3.max(display_data_values),
@@ -211,6 +241,13 @@ https://www.w3schools.com
                       .domain(y_domain);
 
             var bar = svg.selectAll(".bar").data(hist);
+
+            bar.append("text")
+                .attr("dy", ".60em")
+                .attr("y", -12)
+                .attr("x", (x(hist[0].x1) - x(0)) / 2)
+                .attr("text-anchor", "middle")
+                .text("");
 
             // Remove old data
             bar.exit().remove();
@@ -238,15 +275,6 @@ https://www.w3schools.com
                 .attr("width", bar_w)
                 .attr("height", bar_h)
                 .attr("fill", bar_c);
-
-            bar.select("text")
-                .transition()
-                .duration(500)
-                    .attr("dy", ".60em")
-                    .attr("y", -12)
-                    .attr("x", (x(hist[0].x1) - x(0)) / 2)
-                    .attr("text-anchor", "middle")
-                    .text(function(d) {return format_count(d.length);});
 
             // update x axis
             d3.selectAll(".xaxis").remove();
