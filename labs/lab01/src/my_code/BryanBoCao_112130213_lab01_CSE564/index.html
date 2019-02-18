@@ -16,6 +16,7 @@ https://vincentarelbundock.github.io/Rdatasets/datasets.html
 Reference:
 https://getbootstrap.com/docs
 https://www.w3schools.com
+https://www.youtube.com/watch?v=kMCnzUE07QA
 -->
 <html lang="en">
 <head>
@@ -72,14 +73,22 @@ https://www.w3schools.com
         var w = window.innerWidth, h = window.innerHeight - 450;
         var canvas_w = w - 20, canvas_h = h - 320;
         var num_bin = 10;
+
+        // color parameters
         var my_colors = ["#003B46", "#07575B", "#66A5AD", "#C4DFE6"];
+        var color_range = [d3.rgb(my_colors[0]),
+                          d3.rgb(my_colors[2])];
+        var my_scale_colors = d3.scaleOrdinal()
+                          .range(["#003B46", "#07575B", "#66A5AD", "#C4DFE6"]);
+
         var format_count = d3.format(",.0f");
         var margin = 20;
         var hist;
-        var svg = d3.select("#barchart_svg");
-        var svg_w = svg.attr("width") - margin;
-            svg_h = svg.attr("height") - margin;
+        var barchar_svg = d3.select("#barchart_svg");
+        var svg_w = barchar_svg.attr("width") - margin;
+            svg_h = barchar_svg.attr("height") - margin;
         var bar_change_direction = true;
+        var chart_width = 500, chart_height = 960, radius = Math.min(chart_width, chart_height) / 2;
 
         d3.csv("./data/College.csv", function(data) {
 
@@ -101,7 +110,7 @@ https://www.w3schools.com
           function init_barchart(display_data_values) {
 
             console.log("init_barchart()");
-            var g = svg.append("g")
+            var g = barchar_svg.append("g")
                         .attr("transform", "translate(" + margin + ")");
 
             var x_min = d3.min(display_data_values),
@@ -127,8 +136,6 @@ https://www.w3schools.com
                       .range(y_range)
                       .domain(y_domain);
 
-            var color_range = [d3.rgb(my_colors[0]),
-                                d3.rgb(my_colors[2])];
             var color_scale = d3.scaleLinear()
                                 .domain([y_min, y_max])
                                 .range(color_range);
@@ -206,9 +213,9 @@ https://www.w3schools.com
                 .attr("width", bar_w)
                 .attr("height", 0);
 
-            svg.append("g")
+            barchar_svg.append("g")
                 .attr("class", "xaxis")
-                .attr("transform", "translate(0," + svg_h + ")")
+                .attr("transform", "translate(10," + svg_h + ")")
                 .call(d3.axisBottom(x_scale));
 
             bar.select("rect")
@@ -253,7 +260,7 @@ https://www.w3schools.com
                       .range(y_range)
                       .domain(y_domain);
 
-            var bar = svg.selectAll(".bar").data(hist);
+            var bar = barchar_svg.selectAll(".bar").data(hist);
 
             bar.append("text")
                 .attr("dy", ".60em")
@@ -265,8 +272,6 @@ https://www.w3schools.com
             // Remove old data
             bar.exit().remove();
 
-            var color_range = [d3.rgb(my_colors[0]),
-                                d3.rgb(my_colors[2])];
             var color_scale = d3.scaleLinear()
                                 .domain([y_min, y_max])
                                 .range(color_range);
@@ -291,7 +296,7 @@ https://www.w3schools.com
 
             // update x axis
             d3.selectAll(".xaxis").remove();
-            svg.append("g")
+            barchar_svg.append("g")
                 .attr("class", "xaxis")
                 .attr("transform", "translate(0," + svg_h + ")")
                 .call(d3.axisBottom(x));
@@ -302,7 +307,30 @@ https://www.w3schools.com
           } // end of function update_barchart(display_data_values)
 
           function init_piechart(display_data_values) {
-          
+
+            test_data = [10, 200, 500];
+
+            console.log("init_piechart()");
+            console.log(test_data);
+
+            var piechart_svg = d3.select("#piechart_svg");
+            var group = piechart_svg.append("g")
+                        .attr("transform", "translate(400, 300)");
+            var pie = d3.pie().value(function(d) { return d; });
+            var arc = d3.arc()
+                        .innerRadius(0)
+                        .outerRadius(radius);
+
+            console.log(pie(test_data));
+            var arc_group = group.selectAll(".arc")
+                            .data(pie(test_data))
+                            .enter()
+                            .append("g")
+                            .attr("class", "arc");
+
+            arc_group.append("path")
+                    .attr("d", arc)
+                    .attr("fill", function(d){return my_scale_colors(d.data)});
 
           }
 
@@ -366,29 +394,29 @@ https://www.w3schools.com
             if (bar_change_direction) {
               d3.select("#barchart_svg")
                 .transition()
-                .duration(500)
+                .duration(1000)
                 .attr("width", "0")
                 .attr("height", "0")
                 // .attr("transform", "translate(-1000, 0)");
               d3.select("#piechart_svg")
                 .transition()
-                .duration(1000)
-                .attr("width", "500")
-                .attr("height", "960")
+                .duration(1100)
+                .attr("width", (chart_width + 500))
+                .attr("height", chart_height)
                 // .attr("transform", "translate(0, -300)");
               bar_change_direction = false;
             } else {
               d3.select("#piechart_svg")
                 .transition()
-                .duration(500)
+                .duration(1000)
                 .attr("width", "0")
                 .attr("height", "0")
                 // .attr("transform", "translate(-1000, -1000)");
               d3.select("#barchart_svg")
                 .transition()
-                .duration(1000)
-                .attr("width", "500")
-                .attr("height", "960")
+                .duration(1100)
+                .attr("width", (chart_width + 500))
+                .attr("height", chart_height)
                 // .attr("transform", "translate(0, 0)");
               bar_change_direction = true;
             }
