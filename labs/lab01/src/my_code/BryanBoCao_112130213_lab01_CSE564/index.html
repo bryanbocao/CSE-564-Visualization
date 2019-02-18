@@ -70,6 +70,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
         // parameters
         var pre_mouse_x_pos = -1; // -1 means no previous mouse x position has been assigned
         var curr_bar_w = -10; // initial value
+        var max_bar_w = 70, min_bar_w = 3;
         var w = window.innerWidth, h = window.innerHeight - 450;
         var canvas_w = w - 20, canvas_h = h - 320;
         var num_bin = 10;
@@ -351,7 +352,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
 
             var piechart_svg = d3.select("#piechart_svg");
             var group = piechart_svg.append("g")
-                        .attr("transform", "translate(500, 300)");
+                        .attr("transform", "translate(550, 300)");
             var pie = d3.pie().value(function(d) { return d; });
             var arc = d3.arc()
                         .innerRadius(0)
@@ -420,7 +421,8 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
               // move left to make bars thicker
               curr_bar_w++;
             }
-            if (curr_bar_w <= 0) curr_bar_w = 1
+            if (curr_bar_w <= min_bar_w) curr_bar_w = min_bar_w;
+            else if (curr_bar_w > max_bar_w) curr_bar_w = max_bar_w;
             bar.selectAll("rect")
                 .transition()
                 .duration(0)
