@@ -70,7 +70,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
         // parameters
         var pre_mouse_x_pos = -1; // -1 means no previous mouse x position has been assigned
         var curr_bar_w = -10; // initial value
-        var max_bar_w = 70, min_bar_w = 3;
+        var max_bar_w = 70, min_bar_w = 10;
         var w = window.innerWidth, h = window.innerHeight - 450;
         var canvas_w = w - 20, canvas_h = h - 320;
         var num_bin = 10;
@@ -141,7 +141,8 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                                 .domain([y_min, y_max])
                                 .range(color_range);
 
-            var bar_w = x_scale(hist[0].x1) - x_scale(hist[0].x0) - 50,
+            // var bar_w = x_scale(hist[0].x1) - x_scale(hist[0].x0) - 50,
+            var bar_w = max_bar_w,
                 bar_h = function(d) { return svg_h - y_scale(d.length)},
                 bar_c = function(d) { return color_scale(d.length)}, // bar color
                 bar_t = function(d) { return "translate(" + x_scale(d.x0) + "," + y_scale(d.length) + ")";}; // bar transform
@@ -277,7 +278,8 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                                 .domain([y_min, y_max])
                                 .range(color_range);
 
-            var bar_w = x(hist[0].x1) - x(hist[0].x0) - 12,
+            // var bar_w = x(hist[0].x1) - x(hist[0].x0) - 12,
+            var bar_w = max_bar_w,
                 bar_h = function(d) { return svg_h - y(d.length)},
                 bar_c = function(d) { return color_scale(d.length)}, // bar color
                 bar_t = function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")";}; // bar transform
