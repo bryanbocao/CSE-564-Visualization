@@ -415,11 +415,11 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
           if (pre_mouse_x_pos > 0) {
 
             if (pre_mouse_x_pos < event.clientX) {
-              // move right to make bars thinner
-              curr_bar_w--;
-            } else {
-              // move left to make bars thicker
+              // move right to make bars thicker
               curr_bar_w++;
+            } else {
+              // move left to make bars thinner
+              curr_bar_w--;
             }
             if (curr_bar_w <= min_bar_w) curr_bar_w = min_bar_w;
             else if (curr_bar_w > max_bar_w) curr_bar_w = max_bar_w;
