@@ -306,7 +306,22 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
             bar.exit().remove();
           } // end of function update_barchart(display_data_values)
 
-          function init_piechart(display_data_values) {
+          function update_piechart(display_data_values) {
+
+            d3.select("#piechart_svg")
+              .transition()
+              .duration(500)
+              .attr("transform", "translate(-1000, 0)");
+
+            setTimeout(function() {update_piechart_content(display_data_values)}, 500);
+          } // end of function update_piechart(display_data_values)
+
+          function update_piechart_content(display_data_values) {
+
+            d3.select("#piechart_svg")
+              .transition()
+              .duration(500)
+              .attr("transform", "translate(0, 0)");
 
             var x_min = d3.min(display_data_values),
                 x_max = d3.max(display_data_values),
@@ -322,11 +337,12 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                           .thresholds(x_scale.ticks(num_bin))
                           (display_data_values);
 
-            display_data4piechart = [];
-            arc_text_arr = []
+            var display_data4piechart = [],
+                arc_text_arr = [];
+
             for (i = 0; i < num_bin; ++i) {
               display_data4piechart.push(hist[i].length);
-              var arc_text = (hist[i].length < 20) ? "" : d3.min(hist[i]) + "-" + d3.max(hist[i]);
+              var arc_text = (hist[i].length < 1) ? "" : d3.min(hist[i]) + "-" + d3.max(hist[i]);
               arc_text_arr.push(arc_text);
             }
 
@@ -335,7 +351,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
 
             var piechart_svg = d3.select("#piechart_svg");
             var group = piechart_svg.append("g")
-                        .attr("transform", "translate(400, 300)");
+                        .attr("transform", "translate(500, 300)");
             var pie = d3.pie().value(function(d) { return d; });
             var arc = d3.arc()
                         .innerRadius(0)
@@ -357,12 +373,13 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                       .attr("text-anchor", "middle")
                       .attr("font-size", "1em")
                       .attr("fill","white")
-                      .text(function(d, i){return arc_text_arr[i] + " " + d.data});
-
-          }
+                      .text(function(d, i){
+                        if (d.data < 20) return "";
+                        else return "Range: " + arc_text_arr[i] + " Count: " + d.data});
+          } // end of function update_piechart_content(display_data_values)
 
           init_barchart(display_data);
-          init_piechart(display_data);
+          update_piechart(display_data);
 
           // Create a dropdown
           var dropdown_menu = d3.select("#dropdown_div");
@@ -381,6 +398,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
               var attribute = d3.select("#dropdown_id").node().value;
               var display_data = data.map(function(d) {return parseInt(d[attribute])});
               update_barchart(display_data);
+              update_piechart(display_data);
           });
 
         }) // end of d3.csv("./data/College.csv", function(data)
