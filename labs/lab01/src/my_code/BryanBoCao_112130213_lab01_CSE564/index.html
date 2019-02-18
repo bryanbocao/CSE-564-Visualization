@@ -82,7 +82,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
         var my_scale_colors = d3.scaleOrdinal()
                           .range(["#003B46", "#07575B", "#66A5AD", "#C4DFE6"]);
 
-        var format_count = d3.format(",.0f");
+        var format_count = d3.format(",.2f");
         var margin = 20;
         var hist;
         var barchar_svg = d3.select("#barchart_svg");
@@ -153,13 +153,13 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                 .attr("class", "bar")
                 .attr("transform", bar_t);
 
-            bar.append("text")
-                .attr("dy", ".60em")
-                .attr("y", -12)
-                .attr("x", (x_scale(hist[0].x1) - x_scale(0)) / 2)
-                .attr("text-anchor", "middle")
-                .text("");
-                // .text(function(d) {return format_count(d.length);});
+            // bar.append("text")
+            //     .attr("dy", ".60em")
+            //     .attr("y", -12)
+            //     .attr("x", (x_scale(hist[0].x1) - x_scale(0)) / 2)
+            //     .attr("text-anchor", "middle")
+            //     .text("");
+            //     .text(function(d) {return format_count(d.length);});
 
             bar.append("rect")
                 .attr("x", 1)
@@ -340,14 +340,25 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
 
             var display_data4piechart = [],
                 arc_text_arr = [];
+            var total_cnt = 0;
 
+            // get each arc's range as text
             for (i = 0; i < num_bin; ++i) {
               display_data4piechart.push(hist[i].length);
-              var arc_text = (hist[i].length < 1) ? "" : d3.min(hist[i]) + "-" + d3.max(hist[i]);
+              total_cnt += hist[i].length;
+              var arc_text = "Range:"
+              arc_text += (hist[i].length < 1) ? "" : d3.min(hist[i]) + "-" + d3.max(hist[i]);
+              arc_text += " Cnt:" + hist[i].length;
               arc_text_arr.push(arc_text);
             }
 
-            console.log("init_piechart()");
+            // append percentage to each arc's text
+            for (i = 0; i < num_bin; ++i) {
+              var pencentage = format_count((parseFloat(hist[i].length) / total_cnt) * 100);
+              arc_text_arr[i] = arc_text_arr[i] + " " + pencentage + "%";
+            }
+
+            console.log("arc_text_arr:");
             console.log(arc_text_arr);
 
             var piechart_svg = d3.select("#piechart_svg");
@@ -375,8 +386,8 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                       .attr("font-size", "1em")
                       .attr("fill","white")
                       .text(function(d, i){
-                        if (d.data < 20) return "";
-                        else return "Range: " + arc_text_arr[i] + " Count: " + d.data});
+                        if (d.endAngle - d.startAngle < 0.4) return "";
+                        else return arc_text_arr[i]});
           } // end of function update_piechart_content(display_data_values)
 
           init_barchart(display_data);
