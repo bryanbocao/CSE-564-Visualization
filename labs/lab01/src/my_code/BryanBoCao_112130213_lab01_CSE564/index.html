@@ -125,7 +125,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
             var hist = d3.histogram()
                           .domain(x_domain)
                           .thresholds(x_scale.ticks(num_bin))
-                          (display_data);
+                          (display_data_values);
 
             var y_min = d3.min(hist, function(d) { return d.length; }),
                 y_max = d3.max(hist, function(d) { return d.length; }),
@@ -308,10 +308,30 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
 
           function init_piechart(display_data_values) {
 
-            test_data = [10, 200, 500];
+            var x_min = d3.min(display_data_values),
+                x_max = d3.max(display_data_values),
+                x_range = [0, svg_w],
+                x_domain = [0, x_max];
+
+            var x_scale = d3.scaleLinear()
+                      .range(x_range)
+              				.domain(x_domain);
+
+            var hist = d3.histogram()
+                          .domain(x_domain)
+                          .thresholds(x_scale.ticks(num_bin))
+                          (display_data_values);
+
+            display_data4piechart = [];
+            arc_text_arr = []
+            for (i = 0; i < num_bin; ++i) {
+              display_data4piechart.push(hist[i].length);
+              var arc_text = (hist[i].length < 20) ? "" : d3.min(hist[i]) + "-" + d3.max(hist[i]);
+              arc_text_arr.push(arc_text);
+            }
 
             console.log("init_piechart()");
-            console.log(test_data);
+            console.log(arc_text_arr);
 
             var piechart_svg = d3.select("#piechart_svg");
             var group = piechart_svg.append("g")
@@ -321,9 +341,9 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                         .innerRadius(0)
                         .outerRadius(radius);
 
-            console.log(pie(test_data));
+            console.log(pie(display_data4piechart));
             var arc_group = group.selectAll(".arc")
-                            .data(pie(test_data))
+                            .data(pie(display_data4piechart))
                             .enter()
                             .append("g")
                             .attr("class", "arc");
@@ -331,6 +351,13 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
             arc_group.append("path")
                     .attr("d", arc)
                     .attr("fill", function(d){return my_scale_colors(d.data)});
+
+            arc_group.append("text")
+                      .attr("transform", function(d){return "translate(" + arc.centroid(d) + ")";})
+                      .attr("text-anchor", "middle")
+                      .attr("font-size", "1em")
+                      .attr("fill","white")
+                      .text(function(d, i){return arc_text_arr[i] + " " + d.data});
 
           }
 
