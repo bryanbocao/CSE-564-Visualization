@@ -42,12 +42,17 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
     <div id="value_on_bar" class="hidden">
       <p><span id="value"></span></p>
     </div>
-    <div id="canvas" onmousemove="check_lr_movement(event)" onclick="change_chart()">
+    <div id="canvas" onclick="change_chart()">
       <!-- Note that check_lr_movement(event)" is for the requirement of
       7.mouse moves left (right) should decrease (increase) bin width/size -->
       <!-- To canvas div for d3 -->
       <div id="chart_div_id">
         <svg id="barchart_svg" width="960" height="500"></svg>
+      </div>
+      <hr>
+      <hr>
+      <div id="change_bar_size_div" onmousemove="check_lr_movement(event)" style="background-color: #07575B;" width="960" height="100" class="well">
+        <font color="white">Change bar size by moving mouse left or right in this area :) </font>
       </div>
     </div>
 
@@ -185,13 +190,9 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 })
                 .on("mouseout", function(d){
 
-                      // only reset_check_lr_movement after the mouseout transition
-                      // is finished after 500
-                      setTimeout(reset_check_lr_movement, 501);
-
                       d3.select(this)
                           .transition()
-                          .duration(500)
+                          .duration(0)
                           // .attr("x", 1)
                           // .attr("y", 0)
                           .attr("width", width_bf_enlarged)
@@ -506,35 +507,34 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
 
 
         // for 7.mouse moves left (right) should decrease (increase) bin width/size
+        d3.select("#change_bar_size_div")
+          .on('onmousemove', check_lr_movement);
+
         function check_lr_movement(event) {
 
-          var bar = d3.select("#barchart_svg")
-                      .selectAll(".bar");
-          var bar_w = bar.select("rect")
-                          .attr("width");
-          if (curr_bar_w == -10) curr_bar_w = bar_w;
-          if (pre_mouse_x_pos > 0) {
+            var bar = d3.select("#barchart_svg")
+                        .selectAll(".bar");
+            var bar_w = bar.select("rect")
+                            .attr("width");
+            if (curr_bar_w == -10) curr_bar_w = bar_w;
+            if (pre_mouse_x_pos > 0) {
 
-            if (pre_mouse_x_pos < event.clientX) {
-              // move right to make bars thicker
-              curr_bar_w++;
-            } else {
-              // move left to make bars thinner
-              curr_bar_w--;
+              if (pre_mouse_x_pos < event.clientX) {
+                // move right to make bars thicker
+                curr_bar_w++;
+              } else {
+                // move left to make bars thinner
+                curr_bar_w--;
+              }
+              if (curr_bar_w <= min_bar_w) curr_bar_w = min_bar_w;
+              else if (curr_bar_w > max_bar_w) curr_bar_w = max_bar_w;
+              bar.selectAll("rect")
+                  .transition()
+                  .duration(0)
+                  .attr("width", curr_bar_w);
             }
-            if (curr_bar_w <= min_bar_w) curr_bar_w = min_bar_w;
-            else if (curr_bar_w > max_bar_w) curr_bar_w = max_bar_w;
-            bar.selectAll("rect")
-                .transition()
-                .duration(0)
-                .attr("width", curr_bar_w);
-          }
-          pre_mouse_x_pos = event.clientX;
-        }
+            pre_mouse_x_pos = event.clientX;
 
-        function reset_check_lr_movement() {
-          d3.select("#canvas")
-            .attr("onmousemove", "check_lr_movement(event)");
         }
 
         function change_chart() {
@@ -551,6 +551,12 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                   .attr("height", "0")
                   // .attr("transform", "translate(-1000, 0)");
 
+                // hide change bar size area
+                d3.select("#change_bar_size_div")
+                  .transition()
+                  .duration(1000)
+                  .attr("class", "hidden");
+
                 // hide force-directed layout
                 d3.select("#force_svg")
                   .transition()
@@ -564,7 +570,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                   .transition()
                   .duration(1000)
                   .attr("width", (w + 500))
-                  .attr("height", chart_height)
+                  .attr("height", 700)
                   // .attr("transform", "translate(0, -300)");
 
                 graph_type = "pie"; // change to next label when mouse clicks
@@ -580,6 +586,12 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                   .attr("height", "0")
                   // .attr("transform", "translate(-1000, -1000)");
 
+                // hide change bar size area
+                d3.select("#change_bar_size_div")
+                  .transition()
+                  .duration(1000)
+                  .attr("class", "hidden");
+
                 // hide barchart
                 d3.select("#barchart_svg")
                   .transition()
@@ -593,7 +605,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                   .transition()
                   .duration(1000)
                   .attr("width", w)
-                  .attr("height", chart_height)
+                  .attr("height", 800)
                   .attr("transform", "translate(0, 0)");
 
                 graph_type = "force"; // change to next label when mouse clicks
@@ -621,7 +633,13 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                   .transition()
                   .duration(1100)
                   .attr("width", (w + 500))
-                  .attr("height", chart_height)
+                  .attr("height", 500)
+
+                // hide change bar size area
+                d3.select("#change_bar_size_div")
+                  .transition()
+                  .duration(1000)
+                  .attr("class", "well");
 
                 graph_type = "bar"; // change to next label when mouse clicks
               break;
@@ -630,7 +648,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
         }
 
       </script>
-    </div>
+    <!-- </div> -->
 
   </div>
 
