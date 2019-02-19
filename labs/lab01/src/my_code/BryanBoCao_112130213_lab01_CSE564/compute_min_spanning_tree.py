@@ -1,3 +1,9 @@
+'''
+Student: Bryan Bo Cao
+SBU ID: 112130213
+Email: bo.cao.1@stonybrook.edu or boccao@stonybrook.edu
+'''
+
 import pandas as pd
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
@@ -5,8 +11,10 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import minimum_spanning_tree
 import csv
 import json
+from sklearn.preprocessing import normalize
 
-num_data_points = 50
+
+num_data_points = 70
 print("num_data_points: %d" % num_data_points)
 
 data = pd.read_csv("./data/College.csv")
@@ -17,7 +25,9 @@ dist_matrix = squareform(distances)
 
 mst = minimum_spanning_tree(dist_matrix)
 mst = mst.toarray().astype(int)
-print("minimun number of edges: %d" % np.count_nonzero(mst))
+normalized_mst_matrix = normalize(mst, axis=1, norm='l1')
+print("minimun number of edges: %d" % np.count_nonzero(normalized_mst_matrix))
+# print(normalized_mst_matrix)
 
 collage_name = data.iloc[:num_data_points,0:1]
 collage_name_mtx = pd.DataFrame.as_matrix(collage_name)
@@ -38,10 +48,10 @@ for i in range(num_data_points):
             link = {}
             link['source'] = collage_name_mtx[i][0]
             link['target'] = collage_name_mtx[j][0]
-            link['value'] = str(mst[i][j])
+            link['value'] = str(normalized_mst_matrix[i][j])
             write_data['links'].append(link)
 
-print(write_data)
+# print(write_data)
 
 json_file_path = "./data/minimum_spanning_tree_mtx.json"
 with open(json_file_path,"w+") as json_file:
