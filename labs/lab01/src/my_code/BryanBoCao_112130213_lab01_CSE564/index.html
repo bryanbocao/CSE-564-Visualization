@@ -116,6 +116,8 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
 
           function init_barchart(display_data_values) {
 
+            barchar_svg.attr("transform", "translate(20, 20)");
+
             console.log("init_barchart()");
             var g = barchar_svg.append("g")
                         .attr("transform", "translate(" + margin + ")");
@@ -234,6 +236,11 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 .attr("transform", "translate(10," + svg_h + ")")
                 .call(d3.axisBottom(x_scale));
 
+            barchar_svg.append("g")
+                .attr("transform", "translate(" + margin + "," + margin + ")")
+                .attr("class","yaxis")
+                .call(d3.axisRight(y_scale));
+
             bar.select("rect")
                 .transition()
                 .duration(500)
@@ -258,13 +265,13 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 x_range = [0, svg_w],
                 x_domain = [0, x_max];
 
-            var x = d3.scaleLinear()
+            var x_scale = d3.scaleLinear()
                       .range(x_range)
               				.domain(x_domain);
 
             var hist = d3.histogram()
                           .domain(x_domain)
-                          .thresholds(x.ticks(num_bin))
+                          .thresholds(x_scale.ticks(num_bin))
                           (display_data_values);
 
             var y_min = d3.min(hist, function(d) { return d.length; }),
@@ -272,7 +279,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 y_range = [svg_h, 0],
                 y_domain = [0, y_max];
 
-            var y = d3.scaleLinear()
+            var y_scale = d3.scaleLinear()
                       .range(y_range)
                       .domain(y_domain);
 
@@ -281,7 +288,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
             bar.append("text")
                 .attr("dy", ".60em")
                 .attr("y", -12)
-                .attr("x", (x(hist[0].x1) - x(0)) / 2)
+                .attr("x", (x_scale(hist[0].x1) - x_scale(0)) / 2)
                 .attr("text-anchor", "middle")
                 .text("");
 
@@ -294,9 +301,9 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
 
             // var bar_w = x(hist[0].x1) - x(hist[0].x0) - 12,
             var bar_w = max_bar_w,
-                bar_h = function(d) { return svg_h - y(d.length)},
+                bar_h = function(d) { return svg_h - y_scale(d.length)},
                 bar_c = function(d) { return color_scale(d.length)}, // bar color
-                bar_t = function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")";}; // bar transform
+                bar_t = function(d) { return "translate(" + x_scale(d.x0) + "," + y_scale(d.length) + ")";}; // bar transform
 
             bar.transition()
                 .duration(500)
@@ -315,8 +322,15 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
             d3.selectAll(".xaxis").remove();
             barchar_svg.append("g")
                 .attr("class", "xaxis")
-                .attr("transform", "translate(0," + svg_h + ")")
-                .call(d3.axisBottom(x));
+                .attr("transform", "translate(20," + svg_h + ")")
+                .call(d3.axisBottom(x_scale));
+
+            // update y axis
+            d3.selectAll(".yaxis").remove();
+            barchar_svg.append("g")
+                .attr("class", "yaxis")
+                .attr("transform", "translate(20, 0)")
+                .call(d3.axisRight(y_scale));
 
             curr_bar_w = bar_w;
 
@@ -438,7 +452,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
               .attr("id", "force_svg")
               .attr("width", w)
               .attr("height", h)
-              .attr("transform", "translate(-1000, 0)");
+              .attr("transform", "translate(-2000, 0)");
 
           var force_svg = d3.select("#force_svg");
           var simulation = d3.forceSimulation()
@@ -565,7 +579,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                   .duration(1000)
                   .attr("width", "0")
                   .attr("height", "0")
-                  .attr("transform", "translate(-1000, 0)");
+                  .attr("transform", "translate(-2000, 0)");
 
                 // show piechart
                 d3.select("#piechart_svg")
