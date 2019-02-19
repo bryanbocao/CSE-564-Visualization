@@ -168,6 +168,9 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
             //     .text("");
             //     .text(function(d) {return format_count(d.length);});
 
+            var width_enlarged = 150, height_enlarged = 1000,
+                width_bf_enlarged = -1, height_bf_enlarged = -1;
+
             bar.append("rect")
                 .attr("x", 1)
                 .attr("y", 0)
@@ -175,16 +178,21 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 .attr("height", bar_h)
                 .attr("fill", bar_c)
                 .on('mouseover', function(d){
+
+                  // for recovering the bar size when mouseout
+                  width_bf_enlarged = d3.select(this).attr("width");
+                  height_bf_enlarged = d3.select(this).attr("height");
+
                     d3.select("#canvas")
                       .attr("onmousemove", "null");
 
                     d3.select(this)
                       .transition()
                       .duration(500)
-                      .attr("x", -15)
-                      .attr("y", -40)
-                      .attr("width", bar_w + 30)
-                      .attr("height", 1800);
+                      // .attr("x", -15)
+                      // .attr("y", -40)
+                      .attr("width", width_enlarged)
+                      .attr("height", height_enlarged);
 
                     var value_x_pos = event.clientX,
                         value_y_pos = svg_h - d3.select(this).attr("height") + 150;
@@ -208,10 +216,10 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                       d3.select(this)
                           .transition()
                           .duration(500)
-                          .attr("x", 1)
-                          .attr("y", 0)
-                          .attr("width", bar_w)
-                          .attr("height", bar_h);
+                          // .attr("x", 1)
+                          // .attr("y", 0)
+                          .attr("width", width_bf_enlarged)
+                          .attr("height", height_bf_enlarged);
                       d3.select('#value_on_bar').classed('hidden', true);
                 });
 
