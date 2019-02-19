@@ -37,7 +37,7 @@ write_data = {}
 write_data['nodes'] = []
 for i in range(num_data_points):
     node = {}
-    node['id'] = collage_name_mtx[i][0]
+    node['collage_name'] = collage_name_mtx[i][0]
     write_data['nodes'].append(node)
 
 # construct links

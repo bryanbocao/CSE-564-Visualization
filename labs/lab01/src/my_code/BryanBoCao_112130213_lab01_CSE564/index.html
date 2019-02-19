@@ -17,6 +17,7 @@ Reference:
 https://getbootstrap.com/docs
 https://www.w3schools.com
 https://www.youtube.com/watch?v=kMCnzUE07QA
+https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
 -->
 <html lang="en">
 <head>
@@ -36,6 +37,11 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
 
     .hidden {
       display: none;
+    }
+
+    text {
+      font-family: sans-serif;
+      font-size: 10px;
     }
     </style>
 </head>
@@ -89,7 +95,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
         var svg_w = barchar_svg.attr("width") - margin;
             svg_h = barchar_svg.attr("height") - margin;
         var graph_type = "bar";
-        var chart_width = 500, chart_height = 960, radius = Math.min(chart_width, chart_height) / 2;
+        var chart_width = 500, chart_height = 1200, radius = Math.min(chart_width, chart_height) / 2;
 
         d3.csv("./data/College.csv", function(data) {
 
@@ -417,18 +423,87 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
 
         }) // end of d3.csv("./data/College.csv", function(data)
 
-        d3.csv("./data/minimum_spanning_tree_mtx.csv", function(data) {
+        d3.json("./data/minimum_spanning_tree_mtx.json", function(graph_data) {
 
           d3.select("#canvas")
               .append("svg")
               .attr("id", "force_svg")
-              .attr("width", "0")
-              .attr("height", "0")
-              .attr("transform", "translate(0, 0)");
+              .attr("width", w)
+              .attr("height", h)
+              .attr("transform", "translate(-1000, 0)");
+
+          var force_svg = d3.select("#force_svg");
+          var simulation = d3.forceSimulation()
+                  .force("center", d3.forceCenter(w / 2, chart_height / 2 - 200))
+                  .force("charge", d3.forceManyBody().strength(-20))
+                  .force("link", d3.forceLink().id(function(d) { return d.collage_name; }));
+
+          var node_list = force_svg.append("g")
+                                    .attr("class", "nodes")
+                                    .selectAll("g")
+                                        .data(graph_data.nodes)
+                                        .enter()
+                                        .append("g")
+
+          var link_list = force_svg.append("g")
+                                    .attr("class", "links")
+                                    .style("stroke", "#003B46")
+                                    .style("stroke-opacity", "0.9")
+                                    .selectAll("line")
+                                        .data(graph_data.links)
+                                        .enter()
+                                        .append("line")
+                                        .attr("stroke-width", function(d) {return (d.value * 3) + "px";});
+
+          var circles = node_list.append("circle")
+                            .style("stroke-width", "20px")
+                            .style("stroke", "#C4DFE6")
+                            .style("stroke-opacity", "0.4")
+                            .attr("r", 6)
+                            .call(d3.drag().on("start", mousedown)
+                                           .on("end", mouseup));
+
+          node_list.append("text")
+                    .attr('x', 9)
+                    .attr('y', 3)
+                    .text(function(d) {return d.collage_name;}); // use the college name as shown text
+
+          simulation.nodes(graph_data.nodes)
+                    .on("tick", ticked);
+
+          simulation.force("link")
+                    .links(graph_data.links);
 
 
+          function ticked() {
+              //update link_list positions
+              link_list.attr("x1", function(d) { return d.source.x; })
+                       .attr("y1", function(d) { return d.source.y; })
+                       .attr("x2", function(d) { return d.target.x; })
+                       .attr("y2", function(d) { return d.target.y; });
+
+              //update node_list positions
+              node_list.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
+          }
+
+          // enlarge the selected node
+          function mousedown() {
+              d3.select(this)
+                .transition()
+                .duration(500)
+                .attr("r", 60);
+          }
+
+          // make the selected node smaller
+          function mouseup() {
+              d3.select(this)
+                .transition()
+                .duration(500)
+                .attr("r", 6);
+          }
 
         }) // d3.csv("./data/minimum_spanning_tree_mtx.csv", function(data)
+
 
         // for 7.mouse moves left (right) should decrease (increase) bin width/size
         function check_lr_movement(event) {
@@ -482,12 +557,13 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                   .duration(1000)
                   .attr("width", "0")
                   .attr("height", "0")
+                  .attr("transform", "translate(-1000, 0)");
 
                 // show piechart
                 d3.select("#piechart_svg")
                   .transition()
                   .duration(1000)
-                  .attr("width", (chart_width + 500))
+                  .attr("width", (w + 500))
                   .attr("height", chart_height)
                   // .attr("transform", "translate(0, -300)");
 
@@ -516,8 +592,9 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                 d3.select("#force_svg")
                   .transition()
                   .duration(1000)
-                  .attr("width", (chart_width + 500))
+                  .attr("width", w)
                   .attr("height", chart_height)
+                  .attr("transform", "translate(0, 0)");
 
                 graph_type = "force"; // change to next label when mouse clicks
               break;
@@ -530,6 +607,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                   .duration(1000)
                   .attr("width", "0")
                   .attr("height", "0")
+                  .attr("transform", "translate(-1000, 0)");
 
                 // hide piechart
                 d3.select("#piechart_svg")
@@ -542,7 +620,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
                 d3.select("#barchart_svg")
                   .transition()
                   .duration(1100)
-                  .attr("width", (chart_width + 500))
+                  .attr("width", (w + 500))
                   .attr("height", chart_height)
 
                 graph_type = "bar"; // change to next label when mouse clicks
