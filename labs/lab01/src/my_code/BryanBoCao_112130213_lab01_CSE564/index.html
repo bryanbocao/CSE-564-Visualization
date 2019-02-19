@@ -88,7 +88,7 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
         var barchar_svg = d3.select("#barchart_svg");
         var svg_w = barchar_svg.attr("width") - margin;
             svg_h = barchar_svg.attr("height") - margin;
-        var bar_change_direction = true;
+        var graph_type = "bar";
         var chart_width = 500, chart_height = 960, radius = Math.min(chart_width, chart_height) / 2;
 
         d3.csv("./data/College.csv", function(data) {
@@ -417,6 +417,19 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
 
         }) // end of d3.csv("./data/College.csv", function(data)
 
+        d3.csv("./data/minimum_spanning_tree_mtx.csv", function(data) {
+
+          d3.select("#canvas")
+              .append("svg")
+              .attr("id", "force_svg")
+              .attr("width", "0")
+              .attr("height", "0")
+              .attr("transform", "translate(0, 0)");
+
+
+
+        }) // d3.csv("./data/minimum_spanning_tree_mtx.csv", function(data)
+
         // for 7.mouse moves left (right) should decrease (increase) bin width/size
         function check_lr_movement(event) {
 
@@ -451,34 +464,89 @@ https://www.youtube.com/watch?v=kMCnzUE07QA
 
         function change_chart() {
             console.log("change_chart!");
-            if (bar_change_direction) {
-              d3.select("#barchart_svg")
-                .transition()
-                .duration(1000)
-                .attr("width", "0")
-                .attr("height", "0")
-                // .attr("transform", "translate(-1000, 0)");
-              d3.select("#piechart_svg")
-                .transition()
-                .duration(1100)
-                .attr("width", (chart_width + 500))
-                .attr("height", chart_height)
-                // .attr("transform", "translate(0, -300)");
-              bar_change_direction = false;
-            } else {
-              d3.select("#piechart_svg")
-                .transition()
-                .duration(1000)
-                .attr("width", "0")
-                .attr("height", "0")
-                // .attr("transform", "translate(-1000, -1000)");
-              d3.select("#barchart_svg")
-                .transition()
-                .duration(1100)
-                .attr("width", (chart_width + 500))
-                .attr("height", chart_height)
-                // .attr("transform", "translate(0, 0)");
-              bar_change_direction = true;
+            switch(graph_type) {
+              case "bar":
+                // change to piechart
+
+                // hide barchart
+                d3.select("#barchart_svg")
+                  .transition()
+                  .duration(1000)
+                  .attr("width", "0")
+                  .attr("height", "0")
+                  // .attr("transform", "translate(-1000, 0)");
+
+                // hide force-directed layout
+                d3.select("#force_svg")
+                  .transition()
+                  .duration(1000)
+                  .attr("width", "0")
+                  .attr("height", "0")
+
+                // show piechart
+                d3.select("#piechart_svg")
+                  .transition()
+                  .duration(1000)
+                  .attr("width", (chart_width + 500))
+                  .attr("height", chart_height)
+                  // .attr("transform", "translate(0, -300)");
+
+                graph_type = "pie"; // change to next label when mouse clicks
+              break;
+              case "pie":
+                // change to force-directed layout
+
+                // hide piechart
+                d3.select("#piechart_svg")
+                  .transition()
+                  .duration(1000)
+                  .attr("width", "0")
+                  .attr("height", "0")
+                  // .attr("transform", "translate(-1000, -1000)");
+
+                // hide barchart
+                d3.select("#barchart_svg")
+                  .transition()
+                  .duration(1000)
+                  .attr("width", "0")
+                  .attr("height", "0")
+                  // .attr("transform", "translate(-1000, -1000)");
+
+                // show force-directed layout
+                d3.select("#force_svg")
+                  .transition()
+                  .duration(1000)
+                  .attr("width", (chart_width + 500))
+                  .attr("height", chart_height)
+
+                graph_type = "force"; // change to next label when mouse clicks
+              break;
+
+              case "force":
+                // change to barchart
+                // hide force-directed layout
+                d3.select("#force_svg")
+                  .transition()
+                  .duration(1000)
+                  .attr("width", "0")
+                  .attr("height", "0")
+
+                // hide piechart
+                d3.select("#piechart_svg")
+                  .transition()
+                  .duration(1000)
+                  .attr("width", "0")
+                  .attr("height", "0")
+
+                // show barchart
+                d3.select("#barchart_svg")
+                  .transition()
+                  .duration(1100)
+                  .attr("width", (chart_width + 500))
+                  .attr("height", chart_height)
+
+                graph_type = "bar"; // change to next label when mouse clicks
+              break;
             }
 
         }
