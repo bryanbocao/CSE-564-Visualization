@@ -4,6 +4,9 @@ Student: Bryan Bo Cao
 SBU ID: 112130213
 Email: bo.cao.1@stonybrook.edu or boccao@stonybrook.edu
 
+This code is live on https://blockbuilder.org/BryanBo-Cao/1e2f511ee3bbdae742777dc73cf7a441
+PLEASE switch to side-by-side mode to see the whole functionality of this code instead of using fullscreen.
+
 Apply 3 color scheme from Cool Blues (https://www.canva.com/learn/100-color-combinations/),
 which are (#003B46, #07575B, #66A5AD, #C4DFE6) to make the whole theme consistent.
 
@@ -24,7 +27,26 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
 <head>
     <!--  <script src="../d3.min.js"></script> Use D3 library from CDN -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-    <link rel="stylesheet" href="./css/bryanbocao_style.css"/>
+    <style>
+      #value_on_bar {
+        font-size: 20px;
+        background-color: #66A5AD;
+        padding: .30em;
+        color: white;
+        border-radius: 6px;
+        pointer-events: none;
+        position: absolute;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      text {
+        font-family: sans-serif;
+        font-size: 10px;
+      }
+    </style>
     <script src="https://d3js.org/d3.v4.min.js"></script>
 </head>
 <body>
@@ -87,7 +109,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
         // ###########################################################################
         // ####                   Dealing with College.csv                        ####
         // ###########################################################################
-        d3.csv("./data/College.csv", function(data) {
+        d3.csv("College.csv", function(data) {
 
           var attributes = data.columns;
           attributes.shift(); // The first attribute is "", so we need to remove it.
@@ -448,13 +470,13 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
               update_piechart(display_data);
           });
 
-        }) // end of d3.csv("./data/College.csv", function(data)
+        }) // end of d3.csv("College.csv", function(data)
 
         // ###########################################################################
         // ####         Dealing with minimum_spanning_tree_mtx.json               ####
         // ####         including nodes and links dat                             ####
         // ###########################################################################
-        d3.json("./data/minimum_spanning_tree_mtx.json", function(graph_data) {
+        d3.json("minimum_spanning_tree_mtx.json", function(graph_data) {
 
           // init force directed layout
           d3.select("#canvas")
@@ -538,7 +560,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 .attr("r", 6);
           }
 
-        }) // d3.csv("./data/minimum_spanning_tree_mtx.csv", function(data)
+        }) // d3.json("minimum_spanning_tree_mtx.json", function(graph_data)
 
         // ##############################################################################################
         // #### for requirement 7.mouse moves left (right) should decrease (increase) bin width/size ####
