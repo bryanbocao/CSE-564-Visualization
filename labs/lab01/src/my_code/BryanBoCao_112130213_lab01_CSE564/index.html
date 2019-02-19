@@ -106,8 +106,8 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
             var x_min = d3.min(display_data_values),
                 x_max = d3.max(display_data_values),
                 x_range = [0, svg_w],
-                x_domain = [x_min, x_max];
-                // x_domain = [0, x_max];
+                // x_domain = [x_min, x_max];
+                x_domain = [0, x_max];
 
             var x_scale = d3.scaleLinear()
                       .range(x_range)
@@ -237,8 +237,8 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
             var x_min = d3.min(display_data_values),
                 x_max = d3.max(display_data_values),
                 x_range = [0, svg_w],
-                x_domain = [x_min, x_max];
-                // x_domain = [0, x_max];
+                // x_domain = [x_min, x_max];
+                x_domain = [0, x_max];
 
             var x_scale = d3.scaleLinear()
                       .range(x_range)
@@ -332,8 +332,8 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
             var x_min = d3.min(display_data_values),
                 x_max = d3.max(display_data_values),
                 x_range = [0, svg_w],
-                x_domain = [x_min, x_max];
-                // x_domain = [0, x_max];
+                // x_domain = [x_min, x_max];
+                x_domain = [0, x_max];
 
             var x_scale = d3.scaleLinear()
                       .range(x_range)
@@ -350,18 +350,18 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
 
             // get each arc's range as text
             for (i = 0; i < num_bin; ++i) {
-              var len = (hist[i] == undefined) ? 1 : hist[i].length;
+              var len = (hist[i] == undefined) ? 0 : hist[i].length;
               display_data4piechart.push(len);
               total_cnt += len;
               var arc_text = "Range:"
-              arc_text += (len < 1) ? "" : d3.min(hist[i]) + "-" + d3.max(hist[i]);
+              arc_text += (len < 0) ? "" : d3.min(hist[i]) + "-" + d3.max(hist[i]);
               arc_text += " Cnt:" + len;
               arc_text_arr.push(arc_text);
             }
 
             // append percentage to each arc's text
             for (i = 0; i < num_bin; ++i) {
-              var len = (hist[i] == undefined) ? 1 : hist[i].length;
+              var len = (hist[i] == undefined) ? 0 : hist[i].length;
               var pencentage = format_count((parseFloat(len) / total_cnt) * 100);
               arc_text_arr[i] = arc_text_arr[i] + " " + pencentage + "%";
             }
