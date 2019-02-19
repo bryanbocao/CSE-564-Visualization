@@ -18,20 +18,20 @@ print("num_data_points: %d" % num_data_points)
 
 data = pd.read_csv("./data/College.csv")
 df = data.iloc[:num_data_points,2:] # first num_data_points data points
-matrix = pd.DataFrame.as_matrix(df)
+matrix = pd.DataFrame.as_matrix(df) # 2 d array form of the data
 distances = pdist(matrix, metric='euclidean')
-dist_matrix = squareform(distances)
-
-mst = minimum_spanning_tree(dist_matrix)
-mst = mst.toarray().astype(int)
-normalized_mst_matrix = normalize(mst, axis=1, norm='l1')
+dist_matrix = squareform(distances) # distance matrix for each pair of instances
+mst = minimum_spanning_tree(dist_matrix) # minimum spanning tree maxtrix
+mst = mst.toarray().astype(int) # minimum spanning tree maxtrix in integer type
+normalized_mst_matrix = normalize(mst, axis=1, norm='l1') # normalize minimum spanning tree maxtrix
 print("minimun number of edges: %d" % np.count_nonzero(normalized_mst_matrix))
-# print(normalized_mst_matrix)
 
 collage_name = data.iloc[:num_data_points,0:1]
 collage_name_mtx = pd.DataFrame.as_matrix(collage_name)
 
+# data that is going to be written to a file
 write_data = {}
+
 # construct nodes
 write_data['nodes'] = []
 for i in range(num_data_points):

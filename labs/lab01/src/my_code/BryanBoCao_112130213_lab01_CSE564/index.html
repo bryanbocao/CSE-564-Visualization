@@ -2,6 +2,7 @@
 <!--
 Student: Bryan Bo Cao
 SBU ID: 112130213
+Email: bo.cao.1@stonybrook.edu or boccao@stonybrook.edu
 
 Apply 3 color scheme from Cool Blues (https://www.canva.com/learn/100-color-combinations/),
 which are (#003B46, #07575B, #66A5AD, #C4DFE6) to make the whole theme consistent.
@@ -31,7 +32,6 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
   <div class="page-header" align="center">
     <h2>Student: Bryan Bo Cao SBU ID: 112130213</h2>
     <hr>
-    <p>Dataset: College 777 data points, 18 dimensions</p>
     <div id="dropdown_div">
       Select Attribute:
     </div>
@@ -45,7 +45,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
     <div id="canvas" onclick="change_chart()">
       <!-- Note that check_lr_movement(event)" is for the requirement of
       7.mouse moves left (right) should decrease (increase) bin width/size -->
-      <!-- To canvas div for d3 -->
+      <!-- canvas div for d3 -->
       <div id="chart_div_id">
         <svg id="barchart_svg" width="960" height="500"></svg>
       </div>
@@ -57,9 +57,10 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
     </div>
 
     <div id="canvas_script">
-
       <script>
-        // parameters
+        // ###########################################################################
+        // ####                          parameters                               ####
+        // ###########################################################################
         var pre_mouse_x_pos = -1; // -1 means no previous mouse x position has been assigned
         var curr_bar_w = -10; // initial value
         var max_bar_w = 70, min_bar_w = 10;
@@ -83,6 +84,9 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
         var graph_type = "bar";
         var chart_width = 500, chart_height = 1200, radius = Math.min(chart_width, chart_height) / 2;
 
+        // ###########################################################################
+        // ####                   Dealing with College.csv                        ####
+        // ###########################################################################
         d3.csv("./data/College.csv", function(data) {
 
           var attributes = data.columns;
@@ -95,19 +99,26 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
           var display_data = data.map(function(d) { return parseInt(d[attribute])});
           console.log(display_data)
 
+          // canvas
+          // main area to display all different kinds of charts
           var canvas = d3.select("#canvas")
                           .append("svg")
                           .attr("width", canvas_w)
                           .attr("height", canvas_h);
 
+          // ###########################################################################
+          // ####                   barchart_svg                                    ####
+          // ###########################################################################
           function init_barchart(display_data_values) {
 
+            // barchart position
             barchar_svg.attr("transform", "translate(20, 20)");
 
             console.log("init_barchart()");
             var g = barchar_svg.append("g")
                         .attr("transform", "translate(" + margin + ")");
 
+            // compute x scale
             var x_min = d3.min(display_data_values),
                 x_max = d3.max(display_data_values),
                 x_range = [0, svg_w],
@@ -118,11 +129,13 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                       .range(x_range)
               				.domain(x_domain);
 
+            // compute histogram
             var hist = d3.histogram()
                           .domain(x_domain)
                           .thresholds(x_scale.ticks(num_bin))
                           (display_data_values);
 
+            // compute y scale
             var y_min = d3.min(hist, function(d) { return d.length; }),
                 y_max = d3.max(hist, function(d) { return d.length; }),
                 y_range = [svg_h, 0],
@@ -142,6 +155,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 bar_c = function(d) { return color_scale(d.length)}, // bar color
                 bar_t = function(d) { return "translate(" + x_scale(d.x0) + "," + y_scale(d.length) + ")";}; // bar transform
 
+            // bind data hist to bar
             var bar = g.selectAll(".bar")
                 .data(hist)
                 .enter()
@@ -149,9 +163,11 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 .attr("class", "bar")
                 .attr("transform", bar_t);
 
+            // save the size of bar before being enlarged
             var width_enlarged = 150, height_enlarged = 1000,
                 width_bf_enlarged = -1, height_bf_enlarged = -1;
 
+            // append rect
             bar.append("rect")
                 .attr("x", 1)
                 .attr("y", 0)
@@ -170,11 +186,10 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                     d3.select(this)
                       .transition()
                       .duration(500)
-                      // .attr("x", -15)
-                      // .attr("y", -40)
                       .attr("width", width_enlarged)
                       .attr("height", height_enlarged);
 
+                    // show text position
                     var value_x_pos = event.clientX,
                         value_y_pos = svg_h - d3.select(this).attr("height") + 150;
 
@@ -193,8 +208,6 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                       d3.select(this)
                           .transition()
                           .duration(0)
-                          // .attr("x", 1)
-                          // .attr("y", 0)
                           .attr("width", width_bf_enlarged)
                           .attr("height", height_bf_enlarged);
                       d3.select('#value_on_bar').classed('hidden', true);
@@ -206,11 +219,13 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 .attr("width", bar_w)
                 .attr("height", 0);
 
+            // append x axis
             barchar_svg.append("g")
                 .attr("class", "xaxis")
                 .attr("transform", "translate(10," + svg_h + ")")
                 .call(d3.axisBottom(x_scale));
 
+            // append y axis
             barchar_svg.append("g")
                 .attr("transform", "translate(" + margin + "," + margin + ")")
                 .attr("class","yaxis")
@@ -241,15 +256,18 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 // x_domain = [x_min, x_max];
                 x_domain = [0, x_max];
 
+            // compute x scale
             var x_scale = d3.scaleLinear()
                       .range(x_range)
               				.domain(x_domain);
 
+            // compute histogram
             var hist = d3.histogram()
                           .domain(x_domain)
                           .thresholds(x_scale.ticks(num_bin))
                           (display_data_values);
 
+            // compute y scale
             var y_min = d3.min(hist, function(d) { return d.length; }),
                 y_max = d3.max(hist, function(d) { return d.length; }),
                 y_range = [svg_h, 0],
@@ -259,18 +277,13 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                       .range(y_range)
                       .domain(y_domain);
 
+            // bind data hist to bar
             var bar = barchar_svg.selectAll(".bar").data(hist);
-
-            bar.append("text")
-                .attr("dy", ".60em")
-                .attr("y", -12)
-                .attr("x", (x_scale(hist[0].x1) - x_scale(0)) / 2)
-                .attr("text-anchor", "middle")
-                .text("");
 
             // Remove old data
             bar.exit().remove();
 
+            // compute color scale
             var color_scale = d3.scaleLinear()
                                 .domain([y_min, y_max])
                                 .range(color_range);
@@ -287,6 +300,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
 
             console.log(display_data_values)
 
+            // change bar size
             bar.select("rect")
                 .transition()
                 .duration(0)
@@ -310,6 +324,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
 
             curr_bar_w = bar_w;
 
+            // remove data binding
             bar.exit().remove();
           } // end of function update_barchart(display_data_values)
 
@@ -330,16 +345,19 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
               .duration(500)
               .attr("transform", "translate(0, 0)");
 
+            // compute x scale
             var x_min = d3.min(display_data_values),
                 x_max = d3.max(display_data_values),
                 x_range = [0, svg_w],
                 // x_domain = [x_min, x_max];
                 x_domain = [0, x_max];
 
+            // compute y scale
             var x_scale = d3.scaleLinear()
                       .range(x_range)
               				.domain(x_domain);
 
+            // compute histogram
             var hist = d3.histogram()
                           .domain(x_domain)
                           .thresholds(x_scale.ticks(num_bin))
@@ -370,6 +388,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
             console.log("arc_text_arr:");
             console.log(arc_text_arr);
 
+            // add each arc
             var piechart_svg = d3.select("#piechart_svg");
             var group = piechart_svg.append("g")
                         .attr("transform", "translate(550, 300)");
@@ -379,16 +398,20 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                         .outerRadius(radius);
 
             console.log(pie(display_data4piechart));
+            // bind data into arc_group
             var arc_group = group.selectAll(".arc")
                             .data(pie(display_data4piechart))
                             .enter()
                             .append("g")
                             .attr("class", "arc");
 
+            // append path
             arc_group.append("path")
                     .attr("d", arc)
                     .attr("fill", function(d){return my_scale_colors(d.data)});
 
+            // append text
+            // including range, value and ratio
             arc_group.append("text")
                       .attr("transform", function(d){return "translate(" + arc.centroid(d) + ")";})
                       .attr("text-anchor", "middle")
@@ -399,12 +422,14 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                         else return arc_text_arr[i]});
           } // end of function update_piechart_content(display_data_values)
 
+          // actual action to initialize barchart and update piechart
           init_barchart(display_data);
           update_piechart(display_data);
 
           // Create a dropdown
           var dropdown_menu = d3.select("#dropdown_div");
 
+          // set dropdown menu by attribute
           dropdown_menu.append("select")
                       .attr("id", "dropdown_id")
                       .selectAll("option")
@@ -414,6 +439,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                           .attr("value", function(d){return d;})
                           .text(function(d){return d;});
 
+          // update charts when new attritube is selected
           d3.select("select")
             .on("change",function(d){
               var attribute = d3.select("#dropdown_id").node().value;
@@ -424,8 +450,13 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
 
         }) // end of d3.csv("./data/College.csv", function(data)
 
+        // ###########################################################################
+        // ####         Dealing with minimum_spanning_tree_mtx.json               ####
+        // ####         including nodes and links dat                             ####
+        // ###########################################################################
         d3.json("./data/minimum_spanning_tree_mtx.json", function(graph_data) {
 
+          // init force directed layout
           d3.select("#canvas")
               .append("svg")
               .attr("id", "force_svg")
@@ -439,6 +470,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                   .force("charge", d3.forceManyBody().strength(-20))
                   .force("link", d3.forceLink().id(function(d) { return d.collage_name; }));
 
+          // init node list and bind node data
           var node_list = force_svg.append("g")
                                     .attr("class", "nodes")
                                     .selectAll("g")
@@ -446,6 +478,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                                         .enter()
                                         .append("g")
 
+          // init link list and bind link data
           var link_list = force_svg.append("g")
                                     .attr("class", "links")
                                     .style("stroke", "#003B46")
@@ -456,6 +489,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                                         .append("line")
                                         .attr("stroke-width", function(d) {return (d.value * 3) + "px";});
 
+          // display circle for node
           var circles = node_list.append("circle")
                             .style("stroke-width", "20px")
                             .style("stroke", "#C4DFE6")
@@ -464,6 +498,7 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                             .call(d3.drag().on("start", mousedown)
                                            .on("end", mouseup));
 
+          // show university name besides each node
           node_list.append("text")
                     .attr('x', 9)
                     .attr('y', 3)
@@ -505,11 +540,15 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
 
         }) // d3.csv("./data/minimum_spanning_tree_mtx.csv", function(data)
 
-
-        // for 7.mouse moves left (right) should decrease (increase) bin width/size
+        // ##############################################################################################
+        // #### for requirement 7.mouse moves left (right) should decrease (increase) bin width/size ####
+        // ##############################################################################################
         d3.select("#change_bar_size_div")
           .on('onmousemove', check_lr_movement);
 
+        // The idea is to make bars thicker when mouse moving right and
+        // make bars thinner when mouse moving left.
+        // Note that the mouse has to be over the #change_bar_size_div area.
         function check_lr_movement(event) {
 
             var bar = d3.select("#barchart_svg")
@@ -526,17 +565,23 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 // move left to make bars thinner
                 curr_bar_w--;
               }
+
+              // maintain max/min bar width
               if (curr_bar_w <= min_bar_w) curr_bar_w = min_bar_w;
               else if (curr_bar_w > max_bar_w) curr_bar_w = max_bar_w;
+
               bar.selectAll("rect")
                   .transition()
                   .duration(0)
                   .attr("width", curr_bar_w);
             }
-            pre_mouse_x_pos = event.clientX;
+            pre_mouse_x_pos = event.clientX; // for later comparison of new movement
 
         }
 
+        // ###########################################################################
+        // ####                       To Changing each bar                        ####
+        // ###########################################################################
         function change_chart() {
             console.log("change_chart!");
             switch(graph_type) {
@@ -644,13 +689,8 @@ https://bl.ocks.org/heybignick/3faf257bbbbc7743bb72310d03b86ee8
                 graph_type = "bar"; // change to next label when mouse clicks
               break;
             }
-
         }
-
       </script>
-    <!-- </div> -->
-
   </div>
-
 </body>
 </html>
