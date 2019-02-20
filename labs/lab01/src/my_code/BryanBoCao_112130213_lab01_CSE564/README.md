@@ -4,13 +4,15 @@ Student: Bryan Bo Cao
 
 SBU ID: 112130213
 
-Email: bo.cao.1@stonybrook.edu or boccao@cs.stonybrook.edu 
+Email: bo.cao.1@stonybrook.edu or boccao@cs.stonybrook.edu
 
 # Demo
 
 This code is live on https://blockbuilder.org/BryanBo-Cao/1e2f511ee3bbdae742777dc73cf7a441
 
 PLEASE switch to side-by-side mode to see the whole functionality of this code instead of using fullscreen.
+
+Video: https://youtu.be/0LYa9eJWVlg 
 
 # File Structure
 
