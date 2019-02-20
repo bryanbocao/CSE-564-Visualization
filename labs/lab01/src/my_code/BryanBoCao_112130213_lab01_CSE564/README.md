@@ -12,7 +12,7 @@ This code is live on https://blockbuilder.org/BryanBo-Cao/1e2f511ee3bbdae742777d
 
 PLEASE switch to side-by-side mode to see the whole functionality of this code instead of using fullscreen.
 
-Video: https://youtu.be/0LYa9eJWVlg 
+Video: https://youtu.be/0LYa9eJWVlg or https://drive.google.com/file/d/17B9CF45wkOdwSOqX8n0_8E35caYpdrEN/view?usp=sharing
 
 # File Structure
 
