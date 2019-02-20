@@ -1,7 +1,7 @@
 '''
 Student: Bryan Bo Cao
 SBU ID: 112130213
-Email: bo.cao.1@stonybrook.edu or boccao@stonybrook.edu
+Email: bo.cao.1@stonybrook.edu or boccao@cs.stonybrook.edu 
 '''
 
 import pandas as pd
