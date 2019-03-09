@@ -47,7 +47,7 @@ Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <div class="page-header" align="center">
-  <div id="change_bar_size_div" onmousemove="check_lr_movement(event)" style="background-color: #07575B;" width="960" height="100" class="well">
+  <div id="bar_div" style="background-color: #07575B;" width="960" height="100" class="well">
     <font color="white"><h3>Student: Bryan Bo Cao SBU ID: 112130213</h3></font>
   </div>
 </div>
@@ -65,150 +65,18 @@ Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
     </div>
     <hr>
     <hr>
-    <div id="option">
-        <input name="updateButton" type="button" value="Update" onclick="updateData()" />
-    </div>
   </div>
 
   <div id="canvas_script">
     <script>
       // ###########################################################################
-      // ####                          parameters                               ####
+      // ####                Visualize Data from Backent                        ####
       // ###########################################################################
-      var data = {{ data.chart_data | safe }}
-      console.log(data);
+      var vis_data = {{ data | safe }}
+      console.log(vis_data);
+      console.log(vis_data.vis_pca_all_data_eigenvalues);
+      console.log(vis_data.vis_pca_sampled_data_eigenvalues);
 
-
-      var pre_mouse_x_pos = -1; // -1 means no previous mouse x position has been assigned
-      var curr_bar_w = -10; // initial value
-      var max_bar_w = 70, min_bar_w = 10;
-      var w = window.innerWidth, h = window.innerHeight - 450;
-      var canvas_w = w - 20, canvas_h = h - 320;
-      var num_bin = 10;
-
-      // color parameters
-      var my_colors = ["#003B46", "#07575B", "#66A5AD", "#C4DFE6"];
-      var color_range = [d3.rgb(my_colors[0]),
-                        d3.rgb(my_colors[2])];
-      var my_scale_colors = d3.scaleOrdinal()
-                        .range(["#003B46", "#07575B", "#66A5AD", "#C4DFE6"]);
-
-      var format_count = d3.format(",.2f");
-      var margin = 20;
-      var hist;
-      var barchar_svg = d3.select("#barchart_svg");
-      var svg_w = barchar_svg.attr("width") - margin;
-          svg_h = barchar_svg.attr("height") - margin;
-      var graph_type = "bar";
-      var chart_width = 500, chart_height = 1200, radius = Math.min(chart_width, chart_height) / 2;
-
-      // ###########################################################################
-      // ####                   Dealing with College.csv                        ####
-      // ###########################################################################
-      d3.csv("College.csv", function(data) {
-
-        var attributes = data.columns;
-        attributes.shift(); // The first attribute is "", so we need to remove it.
-        attributes.shift(); // clean data
-        console.log(attributes)
-        console.log(attributes.length)
-
-        var attribute = attributes[0];
-        var display_data = data.map(function(d) { return parseInt(d[attribute])});
-        console.log(display_data)
-
-        // canvas
-        // main area to display all different kinds of charts
-        var canvas = d3.select("#canvas")
-                        .append("svg")
-                        .attr("width", canvas_w)
-                        .attr("height", canvas_h);
-        });
-
-
-        // code base from TA
-        var data = {{ data.chart_data | safe }}
-        console.log(data);
-        // Set the dimensions of the canvas / graph
-        var margin = {top: 30, right: 20, bottom: 30, left: 50},
-            width = 600 - margin.left - margin.right,
-            height = 270 - margin.top - margin.bottom;
-
-        // Parse the date / time
-        var parseDate = d3.time.format("%d-%b-%y").parse;
-        //var parseDate = d3.time.format("%y-%b-%d").parse;
-        //var parseDate = d3.time.format("%Y-%m-%d").parse;
-
-        // Set the ranges
-        var x = d3.time.scale().range([0, width]);
-        var y = d3.scale.linear().range([height, 0]);
-
-        // Define the axes
-        var xAxis = d3.svg.axis().scale(x)
-            .orient("bottom").ticks(5);
-
-        var yAxis = d3.svg.axis().scale(y)
-            .orient("left").ticks(5);
-
-        // Define the line
-        var valueline = d3.svg.line()
-            .x(function(d) { return x(d.date); })
-            .y(function(d) { return y(d.close); });
-
-        var valueline2 = d3.svg.line()
-          .x(function(d){ return x(d.date);})
-          .y(function(d){ return y(d.open);});
-
-        // Adds the svg canvas
-        var svg = d3.select("body")
-            .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-                .attr("transform",
-                      "translate(" + margin.left + "," + margin.top + ")");
-
-        // Get the data
-
-
-        drawdata(data)
-
-        // ** Update data section (Called from the onclick)
-        function updateData() {
-
-            // Get the data again
-              // Request the "" page and send some additional data along (while still ignoring the return results).
-            // $.post("", {'data': 'received'}, function(data_infunc){
-              // console.log({data_infunc})
-              $.post("", {'data': 'received'}, function(data_infunc){
-              data2 = JSON.parse(data_infunc.chart_data)
-              console.log(data2);
-              data2.forEach(function(d) {
-              d.date = parseDate(d.date);
-              d.close = +d.close;
-              });
-
-              //console.log(data2);
-              // Scale the range of the data again
-            	x.domain(d3.extent(data2, function(d) { return d.date; }));
-        	    y.domain([0, d3.max(data2, function(d) { return d.close; })]);
-
-            // Select the section we want to apply our changes to
-            var svg = d3.select("body").transition();
-            //
-            // // Make the changes
-                svg.select(".line")   // change the line
-                    .duration(750)
-                    .attr("d", valueline(data2));
-                svg.select(".x.axis") // change the x axis
-                    .duration(750)
-                    .call(xAxis);
-                svg.select(".y.axis") // change the y axis
-                    .duration(750)
-                    .call(yAxis);
-            })
-
-        }
 
     </script>
 </div>

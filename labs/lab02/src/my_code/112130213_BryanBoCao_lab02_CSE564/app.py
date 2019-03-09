@@ -81,12 +81,14 @@ def index():
 
     # ===============================================
     # Wrap data into a single json file for frontend to visualize
-    vis_pca_all_data_eigenvalues = pca_all_data_eigenvalues
-    vis_pca_sampled_data_eigenvalues = pca_sampled_data_eigenvalues
+    vis_pca_all_data_eigenvalues = pca_all_data_eigenvalues.tolist()
+    vis_pca_sampled_data_eigenvalues = pca_sampled_data_eigenvalues.tolist()
     # chart_data = df_all_data.to_dict()
     # chart_data = json.dumps(chart_data, indent=4)
     vis_data = {'vis_pca_all_data_eigenvalues': vis_pca_all_data_eigenvalues,
                 'vis_pca_sampled_data_eigenvalues': vis_pca_sampled_data_eigenvalues}
+
+    # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)
 
 
