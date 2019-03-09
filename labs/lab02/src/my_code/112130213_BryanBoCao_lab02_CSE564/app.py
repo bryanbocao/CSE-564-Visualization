@@ -61,5 +61,6 @@ def index():
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('data2.csv')
+    #df = pd.read_csv('data2.csv')
+    df = pd.read_csv('College.csv')
     app.run(debug=True)
