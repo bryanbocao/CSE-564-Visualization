@@ -17,7 +17,12 @@ import json
 
 from flask import Flask, render_template, request, redirect, Response, jsonify
 import pandas as pd
-from sklearn.utils.random import sample_without_replacement
+from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans
+from sklearn import metrics
+from scipy.spatial.distance import cdist
+import numpy as np
+import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
@@ -40,13 +45,50 @@ def index():
     # TA mentioned in the post @123 and @124 in Piazza that we can use in-built
     # pandas or sklearn method, so I use them directly for task1.
     # Reference: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.sample.html
+    # https://datascience.stackexchange.com/questions/16700/confused-about-how-to-apply-kmeans-on-my-a-dataset-with-features-extracted
+    # https://pythonprogramminglanguage.com/kmeans-elbow-method/
 
-    # sample half
+    # =================== random sampling ====================
     df_sampled_data = df_all_data.sample(n=int(len(df_all_data) / 2))
     print("df_sampled_data:")
     print(df_sampled_data)
     print("Number of instance in sampled_data: %d" % len(df_sampled_data))
     print("Number of dimension of sampled_data: %d" % len(df_sampled_data.columns))
+
+    # ================= stratified sampling ==================
+    # optimize k using elbow
+    distortions = []
+    n_k = range(1,10)
+    decs = []
+    pre_distortion = 0
+    print("KMeans optimizing k using elbow")
+    for k in n_k:
+        kmeans = KMeans(n_clusters=k)
+        kmeans.fit(df_all_data)
+
+        # using standard euclidean distance
+        distortion = np.sum(np.min(cdist(df_all_data, kmeans.cluster_centers_, 'euclidean'), axis=1)) \
+                            / df_all_data.shape[0]
+        distortions.append(distortion)
+        if k == 1: dec = -float("inf")
+        else: dec = distortion - pre_distortion
+        decs.append(dec)
+        pre_distortion = distortion
+        print("k: %d, distortion: %.4f, dec: %0.4f" % (k, distortion, dec))
+
+    elbow_k = 0
+    for i in range(2, len(decs) + 1):
+        diff = decs[i + 1] - decs[i]
+        if diff < 60:
+            elbow_k = i
+            break
+    print("elbow_k: %d" % elbow_k)
+
+    # stratified sampling
+    kmeans = KMeans(n_clusters=elbow_k)
+    kmeans.fit(df_all_data)
+    labels = kmeans.labels_
+    # print(labels)
 
     chart_data = df_all_data.to_dict(orient='records')
     chart_data = json.dumps(chart_data, indent=2)

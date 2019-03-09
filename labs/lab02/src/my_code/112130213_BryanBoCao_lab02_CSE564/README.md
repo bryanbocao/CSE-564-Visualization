@@ -1,6 +1,6 @@
 ## Running Server
 
-> python app.py 
+> python3 app.py
 
 Serving Flask app “dirName"
 
@@ -14,8 +14,11 @@ Restarting with stat
 
 Debugger is active!
 
-Debugger PIN: 855-212-761 
+Debugger PIN: 855-212-761
 
 
 Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
 
+### Environment
+
+Python 3.7.0
