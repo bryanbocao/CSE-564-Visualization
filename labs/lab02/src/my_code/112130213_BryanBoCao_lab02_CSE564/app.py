@@ -34,8 +34,8 @@ def index():
     	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate']]
     print("df_all_data:")
     print(df_all_data)
-    print("Population of all_data: %d" % len(df_all_data))
-    print("Number of dimension of all_data: %d" % len(df_all_data.columns))
+    print("Population of df_all_data: %d" % len(df_all_data))
+    print("Number of dimension of df_all_data: %d" % len(df_all_data.columns))
 
     # ======================== Task1 ========================
     # Task 1: data clustering and decimation (30 points)
@@ -50,11 +50,12 @@ def index():
     # https://datascience.stackexchange.com/questions/16700/confused-about-how-to-apply-kmeans-on-my-a-dataset-with-features-extracted
 
     # =================== random sampling ====================
-    df_sampled_data = df_all_data.sample(n=int(len(df_all_data) / 2))
+    total_n_sample = int(len(df_all_data) / 2) # sample half of the data
+    df_sampled_data = df_all_data.sample(n=total_n_sample)
     print("df_sampled_data:")
     print(df_sampled_data)
-    print("Number of instance in sampled_data: %d" % len(df_sampled_data))
-    print("Number of dimension of sampled_data: %d" % len(df_sampled_data.columns))
+    print("Number of instance in df_sampled_data: %d" % len(df_sampled_data))
+    print("Number of dimension of df_sampled_data: %d" % len(df_sampled_data.columns))
 
     # ================= stratified sampling ==================
     # optimize k using elbow
@@ -102,6 +103,21 @@ def index():
     print("cluster_ratio: ", cluster_ratio)
 
     # stratified sampling
+    df_ss_data_ls = []
+    total_n_sample = int(len(df_all_data) / 2) # sample half of the data
+    for i in range(elbow_k):
+        df_cluster_data = df_all_data_with_clusters.loc[df_all_data_with_clusters['cluster_id'] == i] # select rows whose cluster_id is i
+        n_sample_cluster_i = int(total_n_sample * cluster_ratio[i]) # sample number in cluster i is based on the corresponding ratio
+        df_sampled_cluster_data = df_cluster_data.sample(n=n_sample_cluster_i)
+        df_ss_data_ls.append(df_sampled_cluster_data)
+
+    df_ss_data = pd.DataFrame() # stratified sampled data
+    print("Population of df_all_data: %d" % len(df_all_data))
+    for i in range(elbow_k):
+        df_ss_data = df_ss_data.append(df_ss_data_ls[i])
+        print("Number of cluster %d: %d" % (i, len(df_ss_data_ls[i])))
+    print("Number of instance in df_ss_data: %d" % len(df_ss_data))
+    print("Number of dimension of df_ss_data: %d" % len(df_ss_data.columns))
 
     chart_data = df_all_data.to_dict(orient='records')
     chart_data = json.dumps(chart_data, indent=2)
