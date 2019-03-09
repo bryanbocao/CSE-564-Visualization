@@ -24,43 +24,18 @@ app = Flask(__name__)
 def index():
     #df = pd.read_csv('data.csv').drop('Open', axis=1)
     global df
-    #The current request method is available by using the method attribute
-    if request.method == 'POST':
-        # if request.form['data'] == 'received':
-        data = df[['date','open']]
-        data = data.rename(columns={'open':'close'})
-        print(data)
-        print("Hello World!")
-        chart_data = data.to_dict(orient='records')
-        chart_data = json.dumps(chart_data, indent=2)
-        data = {'chart_data': chart_data}
-        # data = {'chart_data': chart_data}
-        return jsonify(data) # Should be a json string
-
-        # print(request.form['data'])
-        # if request.form['data'] == 'received':
-        #     data = df[['date','open']]
-        #     data = data.rename(columns={'open':'close'})
-        #     print(data)
-        #     chart_data = data.to_dict(orient='records')
-        #     chart_data = json.dumps(chart_data, indent=2)
-        #     data = {'chart_data': chart_data}
-        #     # data = {'chart_data': chart_data}
-        #     return jsonify(data) # Should be a json string
-        # else:
-
-    data = df[['date','close']]
-    chart_data = data.to_dict(orient='records')
+    all_data = df[['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
+    	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate']]
+    print("all_data: ")
+    print(all_data)
+    
+    chart_data = all_data.to_dict(orient='records')
     chart_data = json.dumps(chart_data, indent=2)
     data = {'chart_data': chart_data}
-    return render_template("index.html", data=data)
-
-# @app.route("/member", methods = ['POST', 'GET'])
-# def index():
-    ###
+    return render_template("index.html", data=all_data)
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('data2.csv')
-    # df = pd.read_csv('College.csv')
+    # df = pd.read_csv('data2.csv')
+    df = pd.read_csv('College.csv')
     app.run(debug=True)
