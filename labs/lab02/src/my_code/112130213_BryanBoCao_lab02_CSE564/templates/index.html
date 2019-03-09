@@ -75,6 +75,10 @@ Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
       // ###########################################################################
       // ####                          parameters                               ####
       // ###########################################################################
+      var data = {{ data.chart_data | safe }}
+      console.log(data);
+
+
       var pre_mouse_x_pos = -1; // -1 means no previous mouse x position has been assigned
       var curr_bar_w = -10; // initial value
       var max_bar_w = 70, min_bar_w = 10;

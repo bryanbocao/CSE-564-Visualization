@@ -45,8 +45,6 @@ path {
 
 <script>
 
-var data = {{ data.chart_data | safe }}
-console.log(data);
 // Set the dimensions of the canvas / graph
 var margin = {top: 30, right: 20, bottom: 30, left: 50},
     width = 600 - margin.left - margin.right,
@@ -127,11 +125,11 @@ function updateData() {
     // $.post("", {'data': 'received'}, function(data_infunc){
       // console.log({data_infunc})
       $.post("", {'data': 'received'}, function(data_infunc){
-      data2 = JSON.parse(data_infunc.chart_data)
-      console.log(data2);
-      data2.forEach(function(d) {
-      d.date = parseDate(d.date);
-      d.close = +d.close;
+          data2 = JSON.parse(data_infunc.chart_data)
+          console.log(data2);
+          data2.forEach(function(d) {
+          d.date = parseDate(d.date);
+          d.close = +d.close;
       });
 
       //console.log(data2);

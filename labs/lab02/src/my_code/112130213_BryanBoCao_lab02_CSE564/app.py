@@ -11,6 +11,11 @@ Reference:
 https://getbootstrap.com/docs
 https://www.w3schools.com
 Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
+https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.sample.html
+https://datascience.stackexchange.com/questions/16700/confused-about-how-to-apply-kmeans-on-my-a-dataset-with-features-extracted
+https://pythonprogramminglanguage.com/kmeans-elbow-method/
+https://datascience.stackexchange.com/questions/16700/confused-about-how-to-apply-kmeans-on-my-a-dataset-with-features-extracted
+https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
 '''
 
 import json
@@ -20,6 +25,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.cluster import KMeans
 from sklearn import metrics
+from sklearn import decomposition
 from scipy.spatial.distance import cdist
 import numpy as np
 import matplotlib.pyplot as plt
@@ -44,10 +50,6 @@ def index():
     # ======================== Bryan Bo Cao ========================
     # TA mentioned in the post @123 and @124 in Piazza that we can use in-built
     # pandas or sklearn method, so I use them directly for task1.
-    # Reference: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.sample.html
-    # https://datascience.stackexchange.com/questions/16700/confused-about-how-to-apply-kmeans-on-my-a-dataset-with-features-extracted
-    # https://pythonprogramminglanguage.com/kmeans-elbow-method/
-    # https://datascience.stackexchange.com/questions/16700/confused-about-how-to-apply-kmeans-on-my-a-dataset-with-features-extracted
 
     # =================== random sampling ====================
     df_sampled_data = random_sampling(df_all_data)
@@ -55,10 +57,37 @@ def index():
     # ================= stratified sampling ==================
     df_ss_data = stratified_sampling(df_all_data)
 
-    chart_data = df_all_data.to_dict(orient='records')
-    chart_data = json.dumps(chart_data, indent=2)
-    data = {'chart_data': chart_data}
-    return render_template("index.html", data=df_all_data)
+    # ======================== Task2 ========================
+    # Task 2: dimension reduction (use decimated data) (30 points)
+    # find the intrinsic dimensionality of the data using PCA
+    # produce scree plot visualization and mark the intrinsic dimensionality
+    # NEW: show the scree plots before/after sampling to assess the bias introduced
+    # you could also visualize the before/after sampling data via MDS (see below)
+    # obtain the three attributes with highest PCA loadings
+
+    # ================= PCA -- start ==================
+    pca = decomposition.PCA(n_components='mle')
+    pca_all_data = pca.fit(df_all_data)
+    pca_all_data_eigenvalues = pca_all_data.explained_variance_ratio_
+    print("pca_all_data eigenvalues:", pca_all_data_eigenvalues)
+    # print("pca_all_data.singular_values_:", pca_all_data.singular_values_)
+
+    pca = decomposition.PCA(n_components='mle')
+    pca_sampled_data = pca.fit(df_sampled_data)
+    pca_sampled_data_eigenvalues = pca_sampled_data.explained_variance_ratio_
+    print("pca_sampled_data eigenvalues:", pca_sampled_data_eigenvalues)
+    # print("pca_sampled_data.singular_values_:", pca_sampled_data.singular_values_)
+    # ================= PCA -- end ==================
+
+    # ===============================================
+    # Wrap data into a single json file for frontend to visualize
+    vis_pca_all_data_eigenvalues = pca_all_data_eigenvalues
+    vis_pca_sampled_data_eigenvalues = pca_sampled_data_eigenvalues
+    # chart_data = df_all_data.to_dict()
+    # chart_data = json.dumps(chart_data, indent=4)
+    vis_data = {'vis_pca_all_data_eigenvalues': vis_pca_all_data_eigenvalues,
+                'vis_pca_sampled_data_eigenvalues': vis_pca_sampled_data_eigenvalues}
+    return render_template("index.html", data=vis_data)
 
 
 # =================== random sampling -- start ====================
@@ -136,6 +165,8 @@ def stratified_sampling(df_all_data):
     print("Number of dimension of df_ss_data: %d" % len(df_ss_data.columns))
     return df_ss_data
 # ================= stratified sampling -- end ==================
+
+
 
 
 if __name__ == "__main__":
