@@ -50,14 +50,30 @@ def index():
     # https://datascience.stackexchange.com/questions/16700/confused-about-how-to-apply-kmeans-on-my-a-dataset-with-features-extracted
 
     # =================== random sampling ====================
+    df_sampled_data = random_sampling(df_all_data)
+
+    # ================= stratified sampling ==================
+    df_ss_data = stratified_sampling(df_all_data)
+
+    chart_data = df_all_data.to_dict(orient='records')
+    chart_data = json.dumps(chart_data, indent=2)
+    data = {'chart_data': chart_data}
+    return render_template("index.html", data=df_all_data)
+
+
+# =================== random sampling -- start ====================
+def random_sampling(df_all_data):
     total_n_sample = int(len(df_all_data) / 2) # sample half of the data
     df_sampled_data = df_all_data.sample(n=total_n_sample)
     print("df_sampled_data:")
     print(df_sampled_data)
     print("Number of instance in df_sampled_data: %d" % len(df_sampled_data))
     print("Number of dimension of df_sampled_data: %d" % len(df_sampled_data.columns))
+    return df_sampled_data
+# =================== random sampling -- end =====================
 
-    # ================= stratified sampling ==================
+# ================= stratified sampling -- start ==================
+def stratified_sampling(df_all_data):
     # optimize k using elbow
     distortions = []
     n_k = range(1,10)
@@ -118,11 +134,8 @@ def index():
         print("Number of cluster %d: %d" % (i, len(df_ss_data_ls[i])))
     print("Number of instance in df_ss_data: %d" % len(df_ss_data))
     print("Number of dimension of df_ss_data: %d" % len(df_ss_data.columns))
-
-    chart_data = df_all_data.to_dict(orient='records')
-    chart_data = json.dumps(chart_data, indent=2)
-    data = {'chart_data': chart_data}
-    return render_template("index.html", data=df_all_data)
+    return df_ss_data
+# ================= stratified sampling -- end ==================
 
 
 if __name__ == "__main__":
