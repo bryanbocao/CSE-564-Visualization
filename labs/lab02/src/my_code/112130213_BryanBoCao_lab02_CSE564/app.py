@@ -68,25 +68,25 @@ def index():
     # ================= PCA -- start ==================
     pca = decomposition.PCA(n_components='mle')
     pca_all_data = pca.fit(df_all_data)
-    pca_all_data_eigenvalues = pca_all_data.explained_variance_ratio_
-    print("pca_all_data eigenvalues:", pca_all_data_eigenvalues)
+    pca_all_data_explained_variance_ratio_ = pca_all_data.explained_variance_ratio_
+    print("pca_all_data_explained_variance_ratio_:", pca_all_data_explained_variance_ratio_)
     # print("pca_all_data.singular_values_:", pca_all_data.singular_values_)
+    pca_all_data_explained_variance_ratio_ls = pca_all_data_explained_variance_ratio_.tolist()
 
     pca = decomposition.PCA(n_components='mle')
     pca_sampled_data = pca.fit(df_sampled_data)
-    pca_sampled_data_eigenvalues = pca_sampled_data.explained_variance_ratio_
-    print("pca_sampled_data eigenvalues:", pca_sampled_data_eigenvalues)
+    pca_sampled_data_explained_variance_ratio_ = pca_sampled_data.explained_variance_ratio_
+    print("pca_sampled_data_explained_variance_ratio_:", pca_sampled_data_explained_variance_ratio_)
     # print("pca_sampled_data.singular_values_:", pca_sampled_data.singular_values_)
+    pca_sampled_data_explained_variance_ratio_ls = pca_sampled_data_explained_variance_ratio_.tolist()
     # ================= PCA -- end ==================
 
     # ===============================================
     # Wrap data into a single json file for frontend to visualize
-    vis_pca_all_data_eigenvalues = pca_all_data_eigenvalues.tolist()
-    vis_pca_sampled_data_eigenvalues = pca_sampled_data_eigenvalues.tolist()
     # chart_data = df_all_data.to_dict()
     # chart_data = json.dumps(chart_data, indent=4)
-    vis_data = {'vis_pca_all_data_eigenvalues': vis_pca_all_data_eigenvalues,
-                'vis_pca_sampled_data_eigenvalues': vis_pca_sampled_data_eigenvalues}
+    vis_data = {'pca_all_data_explained_variance_ratio_': pca_all_data_explained_variance_ratio_ls,
+                'pca_sampled_data_explained_variance_ratio_': pca_sampled_data_explained_variance_ratio_ls}
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)

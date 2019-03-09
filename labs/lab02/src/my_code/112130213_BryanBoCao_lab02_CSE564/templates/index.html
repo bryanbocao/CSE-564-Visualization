@@ -74,8 +74,8 @@ Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
       // ###########################################################################
       var vis_data = {{ data | safe }}
       console.log(vis_data);
-      console.log(vis_data.vis_pca_all_data_eigenvalues);
-      console.log(vis_data.vis_pca_sampled_data_eigenvalues);
+      console.log(vis_data.pca_all_data_explained_variance_ratio_);
+      console.log(vis_data.pca_sampled_data_explained_variance_ratio_);
 
 
     </script>
