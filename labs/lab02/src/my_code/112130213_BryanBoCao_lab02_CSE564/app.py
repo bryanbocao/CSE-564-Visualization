@@ -17,25 +17,43 @@ import json
 
 from flask import Flask, render_template, request, redirect, Response, jsonify
 import pandas as pd
-#First of all you have to import it from the flask module:
+from sklearn.utils.random import sample_without_replacement
+
 app = Flask(__name__)
-#By default, a route only answers to GET requests. You can use the methods argument of the route() decorator to handle different HTTP methods.
+
 @app.route("/", methods = ['POST', 'GET'])
 def index():
-    #df = pd.read_csv('data.csv').drop('Open', axis=1)
+
     global df
-    all_data = df[['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
+    df_all_data = df[['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
     	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate']]
-    print("all_data: ")
-    print(all_data)
-    
-    chart_data = all_data.to_dict(orient='records')
+    print("df_all_data:")
+    print(df_all_data)
+    print("Population of all_data: %d" % len(df_all_data))
+    print("Number of dimension of all_data: %d" % len(df_all_data.columns))
+
+    # ======================== Task1 ========================
+    # Task 1: data clustering and decimation (30 points)
+    # implement random sampling and stratified sampling
+    # the latter includes the need for k-means clustering (optimize k using elbow)
+    # ======================== Bryan Bo Cao ========================
+    # TA mentioned in the post @123 and @124 in Piazza that we can use in-built
+    # pandas or sklearn method, so I use them directly for task1.
+    # Reference: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.sample.html
+
+    # sample half
+    df_sampled_data = df_all_data.sample(n=int(len(df_all_data) / 2))
+    print("df_sampled_data:")
+    print(df_sampled_data)
+    print("Number of instance in sampled_data: %d" % len(df_sampled_data))
+    print("Number of dimension of sampled_data: %d" % len(df_sampled_data.columns))
+
+    chart_data = df_all_data.to_dict(orient='records')
     chart_data = json.dumps(chart_data, indent=2)
     data = {'chart_data': chart_data}
-    return render_template("index.html", data=all_data)
+    return render_template("index.html", data=df_all_data)
 
 
 if __name__ == "__main__":
-    # df = pd.read_csv('data2.csv')
     df = pd.read_csv('College.csv')
     app.run(debug=True)
