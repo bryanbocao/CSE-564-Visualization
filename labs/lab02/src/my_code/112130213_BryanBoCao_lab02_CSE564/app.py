@@ -47,6 +47,7 @@ def index():
     # Reference: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.sample.html
     # https://datascience.stackexchange.com/questions/16700/confused-about-how-to-apply-kmeans-on-my-a-dataset-with-features-extracted
     # https://pythonprogramminglanguage.com/kmeans-elbow-method/
+    # https://datascience.stackexchange.com/questions/16700/confused-about-how-to-apply-kmeans-on-my-a-dataset-with-features-extracted
 
     # =================== random sampling ====================
     df_sampled_data = df_all_data.sample(n=int(len(df_all_data) / 2))
@@ -84,11 +85,23 @@ def index():
             break
     print("elbow_k: %d" % elbow_k)
 
-    # stratified sampling
     kmeans = KMeans(n_clusters=elbow_k)
     kmeans.fit(df_all_data)
     labels = kmeans.labels_
     # print(labels)
+
+    # Append cluster_id column to df_all_data
+    df_clusters = pd.DataFrame({'cluster_id': labels})
+    df_all_data_with_clusters = df_all_data.join(df_clusters)
+    # print(df_all_data_with_clusters)
+
+    cluster_ratio = []
+    labels_ls = labels.tolist()
+    for i in range(elbow_k):
+        cluster_ratio.append(float(labels_ls.count(i)) / float(len(labels)))
+    print("cluster_ratio: ", cluster_ratio)
+
+    # stratified sampling
 
     chart_data = df_all_data.to_dict(orient='records')
     chart_data = json.dumps(chart_data, indent=2)
