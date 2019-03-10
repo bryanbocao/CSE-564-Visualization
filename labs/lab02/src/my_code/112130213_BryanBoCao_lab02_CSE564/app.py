@@ -39,8 +39,8 @@ def index():
     global df
     df_all_data = df[['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
     	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate']]
-    print("df_all_data:")
-    print(df_all_data)
+    # print("df_all_data:")
+    # print(df_all_data)
     print("Population of df_all_data: %d" % len(df_all_data))
     print("Number of dimension of df_all_data: %d" % len(df_all_data.columns))
 
@@ -84,9 +84,14 @@ def index():
 
 
     # ================= top2PCAVectors -- start ==================
-    top2PACVectors_all_data = top2PCAVectors(df_all_data_normalized, pca_all_data, "All Data")
-    top2PACVectors_sampled_data = top2PCAVectors(df_sampled_data_normalized, pca_sampled_data, "Sampled Data")
-    top2PACVectors_ss_data = top2PCAVectors(df_ss_data_normalized, pca_ss_data, "Stratified Sampled Data")
+    # top2PACVectors_all_data = top2PCAVectors(df_all_data_normalized, pca_all_data, "All Data")
+    # top2PACVectors_sampled_data = top2PCAVectors(df_sampled_data_normalized, pca_sampled_data, "Sampled Data")
+    # top2PACVectors_ss_data = top2PCAVectors(df_ss_data_normalized, pca_ss_data, "Stratified Sampled Data")
+    pca = decomposition.PCA(n_components=2)
+    pca.fit(df_ss_data_normalized)
+    top2PACVectors_ss_data_t = pca.transform(df_ss_data_normalized)
+    # print("top2PACVectors_ss_data_t: ", top2PACVectors_ss_data_t.tolist())
+
     # ================= top2PCAVectors -- end ====================
 
     # ========= Jsonify Data for Visualization in the Frontend =================
@@ -95,7 +100,8 @@ def index():
     # chart_data = json.dumps(chart_data, indent=4)
     vis_data = {'pca_all_data_explained_variance_ratio_': pca_all_data.explained_variance_ratio_.tolist(),
                 'pca_sampled_data_explained_variance_ratio_': pca_sampled_data.explained_variance_ratio_.tolist(),
-                'pca_ss_data_explained_variance_ratio_': pca_ss_data.explained_variance_ratio_.tolist()};
+                'pca_ss_data_explained_variance_ratio_': pca_ss_data.explained_variance_ratio_.tolist(),
+                'top2PACVectors_ss_data_t': top2PACVectors_ss_data_t.tolist()};
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)
@@ -233,7 +239,6 @@ def myPCA(df_data, data_type):
 # ================= top2PCAVectors -- start ==================
 def top2PCAVectors(df_data, pca, data_type):
     df = df_data.copy().reset_index().drop(columns=['index'])
-
     res_matrix = [] # shape (n_sample, component0, component1, cluster)
                     # Note that cluster is only for "Stratified Sampled Data"
                     # Other data types don't have cluster column.
@@ -252,6 +257,7 @@ def top2PCAVectors(df_data, pca, data_type):
             instance_features.append(int(df.iloc[i]['Cluster']))
         res_matrix.append(instance_features)
     # end of for i in range(len(df)): # each instance
+
     return res_matrix
 # ================= top2PCAVectors -- end ====================
 
