@@ -79,16 +79,65 @@ def index():
     pca_all_data = pca.fit(df_all_data)
     pca_all_data_explained_variance_ratio_ = pca_all_data.explained_variance_ratio_
     print("pca_all_data_explained_variance_ratio_:", pca_all_data_explained_variance_ratio_)
-    # print("pca_all_data.singular_values_:", pca_all_data.singular_values_)
+    pca_all_data_singular_values_ = pca_all_data.singular_values_
+    print("pca_all_data_singular_values_:", pca_all_data_singular_values_)
     pca_all_data_explained_variance_ratio_ls = pca_all_data_explained_variance_ratio_.tolist()
+    pca_all_data_components_ = pca_all_data.components_
+    print("pca_all_data_components_: ", pca_all_data_components_)
+
 
     pca = decomposition.PCA(n_components='mle')
     pca_sampled_data = pca.fit(df_sampled_data)
     pca_sampled_data_explained_variance_ratio_ = pca_sampled_data.explained_variance_ratio_
     print("pca_sampled_data_explained_variance_ratio_:", pca_sampled_data_explained_variance_ratio_)
-    # print("pca_sampled_data.singular_values_:", pca_sampled_data.singular_values_)
+    pca_sampled_data_singular_values_ = pca_sampled_data.singular_values_
+    print("pca_sampled_data_singular_values_:", pca_sampled_data_singular_values_)
     pca_sampled_data_explained_variance_ratio_ls = pca_sampled_data_explained_variance_ratio_.tolist()
+    pca_sampled_data_components_ = pca_sampled_data.components_
+    print("pca_sampled_data_components_: ", pca_sampled_data_components_)
     # ================= PCA -- end ==================
+
+    # ====== Compute the three attributes with highest PCA loadings -- start ======
+    all_data_attribute_loadings = []
+    for j in range(len(pca_all_data_components_[0])):
+        attribute_loading = 0
+        for i in range(len(pca_all_data_components_)):
+            attribute_loading += np.abs(pca_all_data_components_[i][j])
+        all_data_attribute_loadings.append(attribute_loading)
+    print("all_data_attribute_loadings: ", all_data_attribute_loadings)
+    all_data_attribute_loadings_sorted = all_data_attribute_loadings.copy()
+    all_data_attribute_loadings_sorted.sort(reverse = True)
+    print("all_data_attribute_loadings_sorted: ", all_data_attribute_loadings_sorted)
+    top3_attributes_i_all_data = []
+    for i in range(3):
+        top3_attributes_i_all_data.append(all_data_attribute_loadings.index(all_data_attribute_loadings_sorted[i]))
+    print()
+    print("top3_attributes_i_all_data: ", top3_attributes_i_all_data)
+    print("top 3 attributes with highest PCA loadings for all data:")
+    for i in range(3):
+        print("    ", df_all_data.columns[top3_attributes_i_all_data[i]])
+
+
+    sampled_data_attribute_loadings = []
+    for j in range(len(pca_sampled_data_components_[0])):
+        attribute_loading = 0
+        for i in range(len(pca_sampled_data_components_)):
+            attribute_loading += np.abs(pca_sampled_data_components_[i][j])
+        sampled_data_attribute_loadings.append(attribute_loading)
+    print("sampled_data_attribute_loadings: ", sampled_data_attribute_loadings)
+    sampled_data_attribute_loadings_sorted = sampled_data_attribute_loadings.copy()
+    sampled_data_attribute_loadings_sorted.sort(reverse = True)
+    print("sampled_data_attribute_loadings_sorted: ", sampled_data_attribute_loadings_sorted)
+    top3_attributes_i_sampled_data = []
+    for i in range(3):
+        top3_attributes_i_sampled_data.append(sampled_data_attribute_loadings.index(sampled_data_attribute_loadings_sorted[i]))
+    print()
+    print("top3_attributes_i_sampled_data: ", top3_attributes_i_sampled_data)
+    print("top 3 attributes with highest PCA loadings for sampled data:")
+    for i in range(3):
+        print("    ", df_sampled_data.columns[top3_attributes_i_sampled_data[i]])
+    # ====== Compute the three attributes with highest PCA loadings -- end ======
+
 
     # ===============================================
     # Wrap data into a single json file for frontend to visualize
@@ -109,6 +158,8 @@ def random_sampling(df_all_data):
     print(df_sampled_data)
     print("Number of instance in df_sampled_data: %d" % len(df_sampled_data))
     print("Number of dimension of df_sampled_data: %d" % len(df_sampled_data.columns))
+    df_sampled_data.columns = ['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
+    	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate']
     return df_sampled_data
 # =================== random sampling -- end =====================
 
@@ -174,6 +225,8 @@ def stratified_sampling(df_all_data):
         print("Number of cluster %d: %d" % (i, len(df_ss_data_ls[i])))
     print("Number of instance in df_ss_data: %d" % len(df_ss_data))
     print("Number of dimension of df_ss_data: %d" % len(df_ss_data.columns))
+    df_ss_data.columns = ['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
+    	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate', 'Cluster']
     return df_ss_data
 # ================= stratified sampling -- end ==================
 
