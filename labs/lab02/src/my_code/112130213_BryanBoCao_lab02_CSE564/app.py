@@ -130,7 +130,7 @@ def stratified_sampling(df_all_data):
     elbow_k = 0
     for i in range(2, len(decs) + 1):
         diff = decs[i + 1] - decs[i]
-        if diff < 60:
+        if diff < 0.012:
             elbow_k = i
             break
     print("elbow_k: %d" % elbow_k)
