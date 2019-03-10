@@ -12,6 +12,7 @@ Reference:
 https://getbootstrap.com/docs
 https://www.w3schools.com
 Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
+https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
 -->
 <html lang="en">
 <head>
@@ -36,15 +37,33 @@ Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
         font-family: sans-serif;
         font-size: 10px;
       }
+
+      .line {
+          fill: none;
+          /* stroke: #66A5AD; */
+          stroke-width: 5;
+      }
+
+      .overlay {
+        fill: #07575B;
+        pointer-events: all;
+      }
+
+      .dot {
+          fill: #07575B;
+          stroke: #66A5AD;
+      }
+
     </style>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <!-- load the d3.js library -->
+    <script src="http://d3js.org/d3.v5.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 </head>
 
 <body>
 
-<!-- load the d3.js library -->
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 
 <div class="page-header" align="center">
   <div id="bar_div" style="background-color: #07575B;" width="960" height="100" class="well">
@@ -56,19 +75,31 @@ Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
   <div id="value_on_bar" class="hidden">
     <p><span id="value"></span></p>
   </div>
-  <div id="canvas" onclick="change_chart()">
-    <!-- Note that check_lr_movement(event)" is for the requirement of
-    7.mouse moves left (right) should decrease (increase) bin width/size -->
-    <!-- canvas div for d3 -->
-    <div id="chart_div_id">
-      <svg id="barchart_svg" width="960" height="500"></svg>
+  <div id="canvas">
+    <div id="part2_scree_div_id">
+      <!-- <svg id="scree_svg" width="960" height="500"></svg> -->
     </div>
     <hr>
     <hr>
   </div>
+</div><!-- end of <div class="container-fluid well"> -->
 
   <div id="canvas_script">
     <script>
+      // ###########################################################################
+      // ####                          parameters                               ####
+      // ###########################################################################
+      var curr_bar_w = -10; // initial value
+      var max_bar_w = 70, min_bar_w = 10;
+      var w = window.innerWidth, h = window.innerHeight - 450;
+      var canvas_w = w - 20, canvas_h = h - 320;
+      var my_colors = ["#003B46", "#07575B", "#66A5AD", "#C4DFE6"];
+
+      // Set the dimensions of the canvas / graph
+      var margin = {top: 30, right: 20, bottom: 30, left: 50},
+          width = 600 - margin.left - margin.right,
+          height = 270 - margin.top - margin.bottom;
+
       // ###########################################################################
       // ####                Visualize Data from Backent                        ####
       // ###########################################################################
@@ -77,6 +108,94 @@ Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
       console.log(vis_data.pca_all_data_explained_variance_ratio_);
       console.log(vis_data.pca_sampled_data_explained_variance_ratio_);
 
+      // canvas
+      // main area to display all different kinds of charts
+      var canvas = d3.select("#canvas")
+                      .append("svg")
+                      .attr("width", canvas_w)
+                      .attr("height", canvas_h);
+
+      // Code base from TA
+      // Set the dimensions of the canvas / graph
+      var margin = {top: 30, right: 20, bottom: 30, left: 50},
+                    width = 600 - margin.left - margin.right,
+                    height = 270 - margin.top - margin.bottom;
+
+      // Set the ranges
+      var x_scale = d3.scaleLinear().range([0, width]);
+      var y_scale = d3.scaleLinear().range([height, 0]);
+
+      // scree plot
+      scree_plot(vis_data.pca_all_data_explained_variance_ratio_, my_colors[1])
+      scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, my_colors[2])
+
+
+      // ===================== scree_plot -- start =====================
+      function scree_plot(data, color){
+          // Scale the range of the data
+          // Apply margin convention
+          var scree_svg_margin = {top: 50, right: 50, bottom: 50, left: 50},
+              scree_svg_width = window.innerWidth - scree_svg_margin.left - scree_svg_margin.right,
+              scree_svg_height = 300;
+              scree_svg_x_axis_height = 210;
+              // height = window.innerHeight - margin.top - margin.bottom;
+
+          // Use the index as X scale
+          var x_scale = d3.scaleLinear()
+              .domain([0, data.length-1])
+              .range([0, width]);
+
+          // Use data value as Y scale
+          var yScale = d3.scaleLinear()
+              .domain([0, d3.max(data) + 0.1])
+              .range([height, 0]);
+
+          // generate lines
+          var line = d3.line()
+              .x(function(d, i) { return x_scale(i); })
+              .y(function(d) { return y_scale(d.y); })
+
+          // generate line data y->data_value
+          var line_data = data.map(function(d) { return {"y": d} })
+          // console.log(line_data)
+
+          var scree_svg = d3.select("#part2_scree_div_id").append("svg")
+                      .attr("width", scree_svg_width + scree_svg_margin.left + scree_svg_margin.right)
+                      .attr("height", scree_svg_height)
+                      .append("g")
+                          .attr("transform",
+                                "translate(" + (scree_svg_margin.left + 300) + "," +
+                                                scree_svg_margin.top + ")")
+
+          scree_svg.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + scree_svg_height + ")")
+              .call(d3.axisBottom(x_scale))
+              .attr("transform", "translate(" + 0+ "," + scree_svg_x_axis_height + ")");
+
+          scree_svg.append("g")
+              .attr("class", "y axis")
+              .call(d3.axisLeft(y_scale));
+
+          // Append paths
+          scree_svg.append("path")
+              .datum(line_data) // bind data to lines
+              .attr("d", line)
+              .attr("class", "line")
+
+          scree_svg.selectAll(".line")
+              .attr("stroke", color);
+
+          // Append a dot on each datapoint
+          scree_svg.selectAll(".dot")
+              .data(line_data)
+              .enter().append("circle")
+                  .attr("cx", function(d, i) { return x_scale(i) })
+                  .attr("cy", function(d) { return y_scale(d.y) })
+                  .attr("class", "dot")
+                  .attr("r", 6);
+      }
+      // ===================== scree_plot -- end =====================
 
     </script>
 </div>
