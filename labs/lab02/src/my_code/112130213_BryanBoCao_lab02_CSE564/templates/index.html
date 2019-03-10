@@ -173,15 +173,34 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
                                 "translate(" + (scree_svg_margin.left + 300) + "," +
                                                 scree_svg_margin.top + ")")
 
+          // Append x axis
           scree_svg.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + scree_svg_height + ")")
               .call(d3.axisBottom(x_scale))
               .attr("transform", "translate(" + 0+ "," + scree_svg_x_axis_height + ")");
 
+          // Append y axis
           scree_svg.append("g")
               .attr("class", "y axis")
               .call(d3.axisLeft(y_scale));
+
+          // Append text to x axis
+          scree_svg.append("text")
+              .attr("transform",
+                    "translate(" + (scree_svg_margin.left + 220) + " ," +
+                              (scree_svg_x_axis_height + 30) + ")")
+                   .style("text-anchor", "middle")
+                   .text("Component")
+
+          // Append text to y axis
+          scree_svg.append("text")
+              .attr("transform",
+                    "translate(" + (scree_svg_margin.left - 120) + " ," +
+                              (scree_svg_x_axis_height - 110) + ")")
+                    .style("text-anchor", "middle")
+                    .text("Variance Ratio")
+
 
           // Append paths
           scree_svg.append("path")
