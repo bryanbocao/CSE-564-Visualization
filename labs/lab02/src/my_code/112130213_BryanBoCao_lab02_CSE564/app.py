@@ -26,6 +26,7 @@ from sklearn.cluster import KMeans
 from sklearn.cluster import KMeans
 from sklearn import metrics
 from sklearn import decomposition
+from sklearn import preprocessing
 from scipy.spatial.distance import cdist
 import numpy as np
 import matplotlib.pyplot as plt
@@ -51,11 +52,19 @@ def index():
     # TA mentioned in the post @123 and @124 in Piazza that we can use in-built
     # pandas or sklearn method, so I use them directly for task1.
 
+    # Normalize data
+    min_max_scaler = preprocessing.MinMaxScaler()
+    np_scaled = min_max_scaler.fit_transform(df_all_data)
+    df_all_data_normalized = pd.DataFrame(np_scaled)
+    # print("df_all_data_normalized:", df_all_data_normalized)
+
     # =================== random sampling ====================
-    df_sampled_data = random_sampling(df_all_data)
+    # df_sampled_data = random_sampling(df_all_data)
+    df_sampled_data = random_sampling(df_all_data_normalized)
 
     # ================= stratified sampling ==================
-    df_ss_data = stratified_sampling(df_all_data)
+    # df_ss_data = stratified_sampling(df_all_data)
+    df_ss_data = stratified_sampling(df_all_data_normalized)
 
     # ======================== Task2 ========================
     # Task 2: dimension reduction (use decimated data) (30 points)
