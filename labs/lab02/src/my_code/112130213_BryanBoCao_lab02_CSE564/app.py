@@ -79,6 +79,7 @@ def index():
     # ================= PCA -- start ==================
     pca_all_data, top3_attributes_i_all_data_ls = myPCA(df_all_data_normalized, "All Data")
     pca_sampled_data, top3_attributes_i_sampled_data_ls = myPCA(df_sampled_data_normalized, "Sampled Data")
+    pca_ss_data, top3_attributes_i_ss_data_ls = myPCA(df_ss_data_normalized, "Stratified Sampled Data")
     # ================= PCA -- end ==================
 
     # ===============================================
@@ -86,7 +87,8 @@ def index():
     # chart_data = df_all_data.to_dict()
     # chart_data = json.dumps(chart_data, indent=4)
     vis_data = {'pca_all_data_explained_variance_ratio_': pca_all_data.explained_variance_ratio_.tolist(),
-                'pca_sampled_data_explained_variance_ratio_': pca_sampled_data.explained_variance_ratio_.tolist()}
+                'pca_sampled_data_explained_variance_ratio_': pca_sampled_data.explained_variance_ratio_.tolist(),
+                'pca_ss_data_explained_variance_ratio_': pca_ss_data.explained_variance_ratio_.tolist()};
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)
@@ -174,13 +176,22 @@ def stratified_sampling(df_all_data):
 
 # ================= myPCA -- start ==================
 def myPCA(df_data, data_type):
+
+    # Remove cluster for Stratified Sampled Data
+    if data_type == "Stratified Sampled Data":
+        df_data = df_data[['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
+        	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate']]
+
     print()
     pca = decomposition.PCA(n_components='mle')
     pca_data = pca.fit(df_data)
-    pca_data_explained_variance_ratio_ = pca_data.explained_variance_ratio_
+
     print("===================================")
     print(data_type)
+    pca_data_explained_variance_ratio_ = pca_data.explained_variance_ratio_
     print("pca_data_explained_variance_ratio_:", pca_data_explained_variance_ratio_)
+    pca_data_explained_variance_ = pca_data.explained_variance_
+    print("pca_data_explained_variance_:", pca_data_explained_variance_)
     pca_data_singular_values_ = pca_data.singular_values_
     print("pca_data_singular_values_:", pca_data_singular_values_)
     pca_data_explained_variance_ratio_ls = pca_data_explained_variance_ratio_.tolist()

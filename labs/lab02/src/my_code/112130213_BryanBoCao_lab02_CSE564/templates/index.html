@@ -106,6 +106,8 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       console.log(vis_data);
       console.log(vis_data.pca_all_data_explained_variance_ratio_);
       console.log(vis_data.pca_sampled_data_explained_variance_ratio_);
+      console.log(vis_data.pca_ss_data_explained_variance_ratio_);
+
 
       // canvas
       // main area to display all different kinds of charts
@@ -125,8 +127,9 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       var y_scale = d3.scaleLinear().range([height, 0]);
 
       // scree plot
-      scree_plot(vis_data.pca_all_data_explained_variance_ratio_, "All Data", my_colors[1])
+      scree_plot(vis_data.pca_all_data_explained_variance_ratio_, "All Data", my_colors[1]);
       scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, "Sampled Data", my_colors[2])
+      scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", "steelblue");
 
 
       // ===================== scree_plot -- start =====================
