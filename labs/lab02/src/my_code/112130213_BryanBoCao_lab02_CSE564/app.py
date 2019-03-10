@@ -82,7 +82,26 @@ def index():
     pca_ss_data, top3_attributes_i_ss_data_ls = myPCA(df_ss_data_normalized, "Stratified Sampled Data")
     # ================= PCA -- end ==================
 
-    # ===============================================
+
+    # ================= top2PCAVectors -- start ==================
+    df = df_ss_data_normalized.copy()
+    df = df.reset_index()
+    df = df.drop(columns=['index'])
+
+    res_data = [] # shape (n_sample, component0, component1, cluster)
+    for i in range(len(df)): # each instance
+        instance_features = [] # (component0, component1, cluster)
+        for c in range(2): # top 2 components
+            component_v = 0
+            for j in range(len(pca_ss_data.components_[c])): # j: feature index
+                component_v += pca_ss_data.components_[c][j] * \
+                            df.iat[i, j]
+            instance_features.append(component_v)
+        instance_features.append(int(df.iloc[i]['Cluster']))
+        res_data.append(instance_features)
+    # ================= top2PCAVectors -- end ====================
+
+    # ========= Jsonify Data for Visualization in the Frontend =================
     # Wrap data into a single json file for frontend to visualize
     # chart_data = df_all_data.to_dict()
     # chart_data = json.dumps(chart_data, indent=4)
@@ -92,14 +111,14 @@ def index():
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)
-
+# =================== def index() -- end ===================
 
 # =================== random sampling -- start ====================
 def random_sampling(df_all_data):
     total_n_sample = int(len(df_all_data) / 2) # sample half of the data
     df_sampled_data = df_all_data.sample(n=total_n_sample)
-    print("df_sampled_data:")
-    print(df_sampled_data)
+    # print("df_sampled_data:")
+    # print(df_sampled_data)
     print("Number of instance in df_sampled_data: %d" % len(df_sampled_data))
     print("Number of dimension of df_sampled_data: %d" % len(df_sampled_data.columns))
     df_sampled_data.columns = ['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
@@ -167,6 +186,8 @@ def stratified_sampling(df_all_data):
     for i in range(elbow_k):
         df_ss_data = df_ss_data.append(df_ss_data_ls[i])
         print("Number of cluster %d: %d" % (i, len(df_ss_data_ls[i])))
+    # print("df_ss_data:")
+    # print(df_ss_data)
     print("Number of instance in df_ss_data: %d" % len(df_ss_data))
     print("Number of dimension of df_ss_data: %d" % len(df_ss_data.columns))
     df_ss_data.columns = ['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
@@ -220,6 +241,7 @@ def myPCA(df_data, data_type):
     print("===================================")
     return pca_data, top3_attributes_i_ls
 # ================= myPCA -- start ==================
+
 
 if __name__ == "__main__":
     df = pd.read_csv('College.csv')
