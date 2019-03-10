@@ -57,7 +57,8 @@ def index():
     np_scaled = min_max_scaler.fit_transform(df_all_data)
     df_all_data_normalized = pd.DataFrame(np_scaled)
     # print("df_all_data_normalized:", df_all_data_normalized)
-
+    df_all_data_normalized.columns = ['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
+    	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate']
 
     # =================== random sampling ====================
     # df_sampled_data = random_sampling(df_all_data)
