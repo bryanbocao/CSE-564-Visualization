@@ -58,13 +58,14 @@ def index():
     df_all_data_normalized = pd.DataFrame(np_scaled)
     # print("df_all_data_normalized:", df_all_data_normalized)
 
+
     # =================== random sampling ====================
     # df_sampled_data = random_sampling(df_all_data)
-    df_sampled_data = random_sampling(df_all_data_normalized)
+    df_sampled_data_normalized = random_sampling(df_all_data_normalized)
 
     # ================= stratified sampling ==================
     # df_ss_data = stratified_sampling(df_all_data)
-    df_ss_data = stratified_sampling(df_all_data_normalized)
+    df_ss_data_normalized = stratified_sampling(df_all_data_normalized)
 
     # ======================== Task2 ========================
     # Task 2: dimension reduction (use decimated data) (30 points)
@@ -75,76 +76,16 @@ def index():
     # obtain the three attributes with highest PCA loadings
 
     # ================= PCA -- start ==================
-    pca = decomposition.PCA(n_components='mle')
-    pca_all_data = pca.fit(df_all_data)
-    pca_all_data_explained_variance_ratio_ = pca_all_data.explained_variance_ratio_
-    print("pca_all_data_explained_variance_ratio_:", pca_all_data_explained_variance_ratio_)
-    pca_all_data_singular_values_ = pca_all_data.singular_values_
-    print("pca_all_data_singular_values_:", pca_all_data_singular_values_)
-    pca_all_data_explained_variance_ratio_ls = pca_all_data_explained_variance_ratio_.tolist()
-    pca_all_data_components_ = pca_all_data.components_
-    print("pca_all_data_components_: ", pca_all_data_components_)
-
-
-    pca = decomposition.PCA(n_components='mle')
-    pca_sampled_data = pca.fit(df_sampled_data)
-    pca_sampled_data_explained_variance_ratio_ = pca_sampled_data.explained_variance_ratio_
-    print("pca_sampled_data_explained_variance_ratio_:", pca_sampled_data_explained_variance_ratio_)
-    pca_sampled_data_singular_values_ = pca_sampled_data.singular_values_
-    print("pca_sampled_data_singular_values_:", pca_sampled_data_singular_values_)
-    pca_sampled_data_explained_variance_ratio_ls = pca_sampled_data_explained_variance_ratio_.tolist()
-    pca_sampled_data_components_ = pca_sampled_data.components_
-    print("pca_sampled_data_components_: ", pca_sampled_data_components_)
+    pca_all_data, top3_attributes_i_all_data_ls = myPCA(df_all_data_normalized, "All Data")
+    pca_sampled_data, top3_attributes_i_sampled_data_ls = myPCA(df_sampled_data_normalized, "Sampled Data")
     # ================= PCA -- end ==================
-
-    # ====== Compute the three attributes with highest PCA loadings -- start ======
-    all_data_attribute_loadings = []
-    for j in range(len(pca_all_data_components_[0])):
-        attribute_loading = 0
-        for i in range(len(pca_all_data_components_)):
-            attribute_loading += np.abs(pca_all_data_components_[i][j])
-        all_data_attribute_loadings.append(attribute_loading)
-    print("all_data_attribute_loadings: ", all_data_attribute_loadings)
-    all_data_attribute_loadings_sorted = all_data_attribute_loadings.copy()
-    all_data_attribute_loadings_sorted.sort(reverse = True)
-    print("all_data_attribute_loadings_sorted: ", all_data_attribute_loadings_sorted)
-    top3_attributes_i_all_data = []
-    for i in range(3):
-        top3_attributes_i_all_data.append(all_data_attribute_loadings.index(all_data_attribute_loadings_sorted[i]))
-    print()
-    print("top3_attributes_i_all_data: ", top3_attributes_i_all_data)
-    print("top 3 attributes with highest PCA loadings for all data:")
-    for i in range(3):
-        print("    ", df_all_data.columns[top3_attributes_i_all_data[i]])
-
-
-    sampled_data_attribute_loadings = []
-    for j in range(len(pca_sampled_data_components_[0])):
-        attribute_loading = 0
-        for i in range(len(pca_sampled_data_components_)):
-            attribute_loading += np.abs(pca_sampled_data_components_[i][j])
-        sampled_data_attribute_loadings.append(attribute_loading)
-    print("sampled_data_attribute_loadings: ", sampled_data_attribute_loadings)
-    sampled_data_attribute_loadings_sorted = sampled_data_attribute_loadings.copy()
-    sampled_data_attribute_loadings_sorted.sort(reverse = True)
-    print("sampled_data_attribute_loadings_sorted: ", sampled_data_attribute_loadings_sorted)
-    top3_attributes_i_sampled_data = []
-    for i in range(3):
-        top3_attributes_i_sampled_data.append(sampled_data_attribute_loadings.index(sampled_data_attribute_loadings_sorted[i]))
-    print()
-    print("top3_attributes_i_sampled_data: ", top3_attributes_i_sampled_data)
-    print("top 3 attributes with highest PCA loadings for sampled data:")
-    for i in range(3):
-        print("    ", df_sampled_data.columns[top3_attributes_i_sampled_data[i]])
-    # ====== Compute the three attributes with highest PCA loadings -- end ======
-
 
     # ===============================================
     # Wrap data into a single json file for frontend to visualize
     # chart_data = df_all_data.to_dict()
     # chart_data = json.dumps(chart_data, indent=4)
-    vis_data = {'pca_all_data_explained_variance_ratio_': pca_all_data_explained_variance_ratio_ls,
-                'pca_sampled_data_explained_variance_ratio_': pca_sampled_data_explained_variance_ratio_ls}
+    vis_data = {'pca_all_data_explained_variance_ratio_': pca_all_data.explained_variance_ratio_.tolist(),
+                'pca_sampled_data_explained_variance_ratio_': pca_sampled_data.explained_variance_ratio_.tolist()}
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)
@@ -230,8 +171,43 @@ def stratified_sampling(df_all_data):
     return df_ss_data
 # ================= stratified sampling -- end ==================
 
+# ================= myPCA -- start ==================
+def myPCA(df_data, data_type):
+    print()
+    pca = decomposition.PCA(n_components='mle')
+    pca_data = pca.fit(df_data)
+    pca_data_explained_variance_ratio_ = pca_data.explained_variance_ratio_
+    print("===================================")
+    print(data_type)
+    print("pca_data_explained_variance_ratio_:", pca_data_explained_variance_ratio_)
+    pca_data_singular_values_ = pca_data.singular_values_
+    print("pca_data_singular_values_:", pca_data_singular_values_)
+    pca_data_explained_variance_ratio_ls = pca_data_explained_variance_ratio_.tolist()
+    pca_data_components_ = pca_data.components_
+    # print("pca_data_components_: ", pca_data_components_)
 
-
+    # ====== Compute the three attributes with highest PCA loadings -- start ======
+    attribute_loadings = []
+    for j in range(len(pca_data_components_[0])):
+        attribute_loading = 0
+        for i in range(len(pca_data_components_)):
+            attribute_loading += np.abs(pca_data_components_[i][j])
+        attribute_loadings.append(attribute_loading)
+    print("attribute_loadings: ", attribute_loadings)
+    attribute_loadings_sorted = attribute_loadings.copy()
+    attribute_loadings_sorted.sort(reverse = True)
+    print("attribute_loadings_sorted: ", attribute_loadings_sorted)
+    top3_attributes_i_ls = []
+    for i in range(3):
+        top3_attributes_i_ls.append(attribute_loadings.index(attribute_loadings_sorted[i]))
+    print()
+    print("top3_attributes_i_ls: ", top3_attributes_i_ls)
+    print("top 3 attributes with highest PCA loadings:")
+    for i in range(3):
+        print("    ", df_data.columns[top3_attributes_i_ls[i]])
+    print("===================================")
+    return pca_data, top3_attributes_i_ls
+# ================= myPCA -- start ==================
 
 if __name__ == "__main__":
     df = pd.read_csv('College.csv')
