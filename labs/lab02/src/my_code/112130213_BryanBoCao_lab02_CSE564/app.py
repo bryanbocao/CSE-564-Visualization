@@ -84,21 +84,9 @@ def index():
 
 
     # ================= top2PCAVectors -- start ==================
-    df = df_ss_data_normalized.copy()
-    df = df.reset_index()
-    df = df.drop(columns=['index'])
-
-    res_data = [] # shape (n_sample, component0, component1, cluster)
-    for i in range(len(df)): # each instance
-        instance_features = [] # (component0, component1, cluster)
-        for c in range(2): # top 2 components
-            component_v = 0
-            for j in range(len(pca_ss_data.components_[c])): # j: feature index
-                component_v += pca_ss_data.components_[c][j] * \
-                            df.iat[i, j]
-            instance_features.append(component_v)
-        instance_features.append(int(df.iloc[i]['Cluster']))
-        res_data.append(instance_features)
+    top2PACVectors_all_data = top2PCAVectors(df_all_data_normalized, pca_all_data, "All Data")
+    top2PACVectors_sampled_data = top2PCAVectors(df_sampled_data_normalized, pca_sampled_data, "Sampled Data")
+    top2PACVectors_ss_data = top2PCAVectors(df_ss_data_normalized, pca_ss_data, "Stratified Sampled Data")
     # ================= top2PCAVectors -- end ====================
 
     # ========= Jsonify Data for Visualization in the Frontend =================
@@ -241,6 +229,31 @@ def myPCA(df_data, data_type):
     print("===================================")
     return pca_data, top3_attributes_i_ls
 # ================= myPCA -- start ==================
+
+# ================= top2PCAVectors -- start ==================
+def top2PCAVectors(df_data, pca, data_type):
+    df = df_data.copy().reset_index().drop(columns=['index'])
+
+    res_matrix = [] # shape (n_sample, component0, component1, cluster)
+                    # Note that cluster is only for "Stratified Sampled Data"
+                    # Other data types don't have cluster column.
+    for i in range(len(df)): # each instance
+        instance_features = []  # (component0, component1, cluster)
+                                # Note that cluster is only for "Stratified Sampled Data"
+                                # Other data types don't have cluster column.
+        for c in range(2): # top 2 components
+            component_v = 0
+            for j in range(len(pca.components_[c])): # j: feature index
+                component_v += pca.components_[c][j] * \
+                            df.iat[i, j]
+            instance_features.append(component_v)
+
+        if data_type == "Stratified Sampled Data":
+            instance_features.append(int(df.iloc[i]['Cluster']))
+        res_matrix.append(instance_features)
+    # end of for i in range(len(df)): # each instance
+    return res_matrix
+# ================= top2PCAVectors -- end ====================
 
 
 if __name__ == "__main__":
