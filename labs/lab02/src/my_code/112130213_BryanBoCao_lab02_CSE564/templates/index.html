@@ -52,12 +52,17 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       .dot {
           fill: #07575B;
           stroke: #66A5AD;
+          fill-opacity: .7;
       }
 
       .axis {
           font-size: 18px;
       }
       .title {
+          font-size: 18px;
+          background-color: #66A5AD;
+      }
+      .label {
           font-size: 18px;
           background-color: #66A5AD;
       }
@@ -78,8 +83,9 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
 
 <div class="container-fluid well">
   <div id="canvas">
-    <div id="part2_scree_div_id" align="center">
-    </div>
+    <div id="part2_scree_div_id" align="center"></div>
+    <hr/>
+    <div id="part3_scatter_div_id" align="center"></div>
   </div>
 </div><!-- end of <div class="container-fluid well"> -->
 
@@ -94,11 +100,6 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       var canvas_w = w - 20, canvas_h = h - 320;
       var my_colors = ["#003B46", "#07575B", "#66A5AD", "#C4DFE6"];
 
-      // Set the dimensions of the canvas / graph
-      var margin = {top: 30, right: 20, bottom: 30, left: 50},
-          width = 600 - margin.left - margin.right,
-          height = 270 - margin.top - margin.bottom;
-
       // ###########################################################################
       // ####                Visualize Data from Backent                        ####
       // ###########################################################################
@@ -107,7 +108,6 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       console.log(vis_data.pca_all_data_explained_variance_ratio_);
       console.log(vis_data.pca_sampled_data_explained_variance_ratio_);
       console.log(vis_data.pca_ss_data_explained_variance_ratio_);
-
 
       // canvas
       // main area to display all different kinds of charts
@@ -131,6 +131,10 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, "Sampled Data", my_colors[2])
       scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", "steelblue");
 
+      // part3 scatter plot
+      scatter_plot(vis_data.top2PACVectors_all_data_t);
+      scatter_plot(vis_data.top2PACVectors_sampled_data_t);
+      // scatter_plot(vis_data.top2PACVectors_ss_data_t);
 
       // ===================== scree_plot -- start =====================
       function scree_plot(data, title, color){
@@ -192,7 +196,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
 
           // Append text to x axis
           scree_svg.append("text")
-              .attr("class", "axis")
+              .attr("class", "x axis")
               .attr("transform",
                     "translate(" + (scree_svg_margin.left + 220) + " ," +
                               (scree_svg_x_axis_height + 30) + ")")
@@ -201,7 +205,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
 
           // Append text to y axis
           scree_svg.append("text")
-              .attr("class", "axis")
+              .attr("class", "y axis")
               .attr("transform",
                     "translate(" + (scree_svg_margin.left - 140) + " ," +
                               (scree_svg_x_axis_height - 110) + ")")
@@ -216,7 +220,6 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
                 .attr("text-anchor", "middle")
                 .attr("font-size", "150%")
                 .text(title);
-
 
           // Append paths
           scree_svg.append("path")
@@ -238,6 +241,72 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
 
       }
       // ===================== scree_plot -- end =====================
+
+      // ===================== scatter_plot -- start =====================
+      function scatter_plot(data){
+
+          var scatter_svg_margin = {top: 50, right: 50, bottom: 50, left: 50},
+              width = 500 - scatter_svg_margin.left - scatter_svg_margin.right,
+              height = 500 - scatter_svg_margin.top - scatter_svg_margin.bottom;
+
+          var x = d3.scaleLinear()
+                    .range([0, width]);
+          var y = d3.scaleLinear()
+                    .range([height, 0]);
+
+          var x_axis = d3.axisBottom(x);
+          var y_axis = d3.axisLeft(y);
+
+          var scatter_svg = d3.select("#part3_scatter_div_id").append("svg")
+              .attr("width", width + scatter_svg_margin.left + scatter_svg_margin.right)
+              .attr("height", height + scatter_svg_margin.top + scatter_svg_margin.bottom)
+                .append("g")
+                  .attr("transform", "translate(" + scatter_svg_margin.left + "," + scatter_svg_margin.top + ")");
+
+              x.domain([-2, 2])
+              y.domain([-2, 2])
+
+              // Append x axis
+              scatter_svg.append("g")
+                  .attr("class", "x axis")
+                  .attr("transform", "translate(0," + (height / 2) + ")") // center of the plot
+                  .call(x_axis);
+
+              // Append y axis
+              scatter_svg.append("g")
+                  .attr("class", "y axis")
+                  .attr("transform", "translate(" + (width / 2) + ",0)") // center of the plot
+                  .call(y_axis);
+
+              // Append text to x axis
+              scatter_svg.append("text")
+                  .attr("class", "x axis")
+                  .attr("transform",
+                        "translate(" + (width / 2) + " ," +
+                                  (-18) + ")")
+                        .style("text-anchor", "middle")
+                        .text("Component1")
+
+              // Append text to y axis
+              scatter_svg.append("text")
+                    .attr("class", "y axis")
+                    .attr("transform",
+                          "translate(" + (scatter_svg_margin.left + width - 100) + " ," +
+                                    (height / 2 + 40) + ")")
+                          .style("text-anchor", "middle")
+                          .text("Component0")
+
+              // Append data dots
+              scatter_svg.selectAll(".dot")
+                  .data(data)
+                  .enter().append("circle")
+                    .attr("cx", function(d) { return x(d[0]); })
+                    .attr("cy", function(d) { return y(d[1]); })
+                    .attr("class", "dot")
+                    .attr("r", 3);
+
+      }
+      // ===================== scatter_plot -- end =====================
 
     </script>
 </div>
