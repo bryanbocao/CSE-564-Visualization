@@ -54,6 +54,14 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
           stroke: #66A5AD;
       }
 
+      .axis {
+          font-size: 18px;
+      }
+      .title {
+          font-size: 18px;
+          background-color: #66A5AD;
+      }
+
     </style>
     <!-- load the d3.js library -->
     <script src="http://d3js.org/d3.v5.min.js"></script>
@@ -124,12 +132,13 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       var y_scale = d3.scaleLinear().range([height, 0]);
 
       // scree plot
-      scree_plot(vis_data.pca_all_data_explained_variance_ratio_, my_colors[1])
-      scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, my_colors[2])
+      scree_plot(vis_data.pca_all_data_explained_variance_ratio_, "All Data", my_colors[1])
+      scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, "Sampled Data", my_colors[2])
 
 
       // ===================== scree_plot -- start =====================
-      function scree_plot(data, color){
+      function scree_plot(data, title, color){
+
           // Scale the range of the data
           // Apply margin convention
           var scree_svg_margin = {top: 50, right: 50, bottom: 50, left: 50},
@@ -187,6 +196,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
 
           // Append text to x axis
           scree_svg.append("text")
+              .attr("class", "axis")
               .attr("transform",
                     "translate(" + (scree_svg_margin.left + 220) + " ," +
                               (scree_svg_x_axis_height + 30) + ")")
@@ -195,11 +205,21 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
 
           // Append text to y axis
           scree_svg.append("text")
+              .attr("class", "axis")
               .attr("transform",
-                    "translate(" + (scree_svg_margin.left - 120) + " ," +
+                    "translate(" + (scree_svg_margin.left - 140) + " ," +
                               (scree_svg_x_axis_height - 110) + ")")
                     .style("text-anchor", "middle")
                     .text("Variance Ratio")
+
+
+          scree_svg.append("text")
+                .attr("class", "title")
+                .attr("x", width/2)
+                .attr("y", 0 - (scree_svg_margin.top / 2))
+                .attr("text-anchor", "middle")
+                .attr("font-size", "150%")
+                .text(title);
 
 
           // Append paths
@@ -219,6 +239,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
                   .attr("cy", function(d) { return y_scale(d.y) })
                   .attr("class", "dot")
                   .attr("r", 6);
+
       }
       // ===================== scree_plot -- end =====================
 
