@@ -103,6 +103,11 @@ def index():
     embedding_MDS_sampled_data_correlation_t = myMDS(df_sampled_data_normalized, "correlation", "Sampled Data")
     # ================= MDS -- end ====================
 
+    # ================= Scatter Plot Matrix -- start ====================
+    scatterplot_matrix_all_data = computeScatterPlotMatrix(df_all_data_normalized, top3_attributes_i_all_data_ls)
+    scatterplot_matrix_sampled_data = computeScatterPlotMatrix(df_sampled_data_normalized, top3_attributes_i_sampled_data_ls)
+    # ================= Scatter Plot Matrix -- end ====================
+
 
     # ========= Jsonify Data for Visualization in the Frontend =================
     # Wrap data into a single json file for frontend to visualize
@@ -117,7 +122,9 @@ def index():
                 'embedding_MDS_all_data_euclidean_t': embedding_MDS_all_data_euclidean_t,
                 'embedding_MDS_sampled_data_euclidean_t': embedding_MDS_sampled_data_euclidean_t,
                 'embedding_MDS_all_data_correlation_t': embedding_MDS_all_data_correlation_t,
-                'embedding_MDS_sampled_data_correlation_t': embedding_MDS_sampled_data_correlation_t};
+                'embedding_MDS_sampled_data_correlation_t': embedding_MDS_sampled_data_correlation_t,
+                'scatterplot_matrix_all_data': scatterplot_matrix_all_data,
+                'scatterplot_matrix_sampled_data': scatterplot_matrix_sampled_data};
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)
@@ -273,6 +280,12 @@ def myMDS(data, dissimilarity, data_type):
         embedding_MDS_data_t = embedding.fit_transform(cosine_distance)
         return embedding_MDS_data_t.tolist()
 # ================= MDS -- end ====================
+
+# ================= Scatter Plot Matrix -- start ====================
+def computeScatterPlotMatrix(df, top3_attributes_i_ls):
+    df_top3_attributes = df.iloc[:, top3_attributes_i_ls]
+    return df_top3_attributes.values.tolist()
+# ================= Scatter Plot Matrix -- end ====================
 
 
 if __name__ == "__main__":
