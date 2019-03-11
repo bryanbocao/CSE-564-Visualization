@@ -74,7 +74,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
 
 <body>
 <div class="page-header" align="center">
-  <div id="bar_div" style="background-color: #07575B;" width="960" height="80" class="well">
+  <div id="bar_div" style="background-color: #24446A;" width="960" height="80" class="well">
     <font color="white"><h4>Student: Bryan Bo Cao SBU ID: 112130213</h4></font>
   </div>
 </div>
@@ -96,7 +96,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       var max_bar_w = 70, min_bar_w = 10;
       var w = window.innerWidth, h = window.innerHeight - 450;
       var canvas_w = w - 20, canvas_h = h - 320;
-      var my_colors = ["#003B46", "#07575B", "#66A5AD", "#C4DFE6"];
+      var my_colors = ["#58A437", "#391C54", "#24446A"];
 
       // ###########################################################################
       // ####                Visualize Data from Backent                        ####
@@ -125,20 +125,20 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       var y_scale = d3.scaleLinear().range([height, 0]);
 
       // scree plot
-      scree_plot(vis_data.pca_all_data_explained_variance_ratio_, "All Data", my_colors[1]);
-      scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, "Sampled Data", my_colors[2])
-      scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", "black");
+      scree_plot(vis_data.pca_all_data_explained_variance_ratio_, "All Data", my_colors[0]);
+      scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, "Sampled Data", my_colors[1])
+      scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", my_colors[2]);
 
       // part3 scatter plot
-      scatter_plot(vis_data.top2PACVectors_all_data_t, "Top 2 PCA Vectors: All Data", "Component0", "Component1", my_colors[1], [-2, 2]);
-      scatter_plot(vis_data.top2PACVectors_sampled_data_t, "Top 2 PCA Vectors: Sampled Data", "Component0", "Component1", my_colors[1], [-2, 2]);
+      scatter_plot(vis_data.top2PACVectors_all_data_t, "Top 2 PCA Vectors: All Data", "Component0", "Component1", my_colors[0], [-2, 2]);
+      scatter_plot(vis_data.top2PACVectors_sampled_data_t, "Top 2 PCA Vectors: Sampled Data", "Component0", "Component1", my_colors[0], [-2, 2]);
       // scatter_plot(vis_data.top2PACVectors_ss_data_t, "Top 2 PCA Vectors: Stratified Sampled Data", my_colors[2]);
 
       // part3 visualize the data via MDS (Euclidian & correlation distance) in 2D scatterplots
-      scatter_plot(vis_data.embedding_MDS_all_data_euclidean_t, "MDS (Euclidian): All Data", "", "", my_colors[0], [-2, 2]);
-      scatter_plot(vis_data.embedding_MDS_sampled_data_euclidean_t, "MDS (Euclidian): Sampled Data", "", "", my_colors[0], [-2, 2]);
-      scatter_plot(vis_data.embedding_MDS_all_data_correlation_t, "MDS (Correlation): All Data", "", "", my_colors[0], [-0.5, 0.5]);
-      scatter_plot(vis_data.embedding_MDS_sampled_data_correlation_t, "MDS (Correlation): Sampled Data", "", "", my_colors[0], [-0.5, 0.5]);
+      scatter_plot(vis_data.embedding_MDS_all_data_euclidean_t, "MDS (Euclidian): All Data", "", "", my_colors[1], [-2, 2]);
+      scatter_plot(vis_data.embedding_MDS_sampled_data_euclidean_t, "MDS (Euclidian): Sampled Data", "", "", my_colors[1], [-2, 2]);
+      scatter_plot(vis_data.embedding_MDS_all_data_correlation_t, "MDS (Correlation): All Data", "", "", my_colors[2], [-0.5, 0.5]);
+      scatter_plot(vis_data.embedding_MDS_sampled_data_correlation_t, "MDS (Correlation): Sampled Data", "", "", my_colors[2], [-0.5, 0.5]);
 
       // ===================== scree_plot -- start =====================
       function scree_plot(data, title, color){
@@ -180,7 +180,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
                       .on("mouseout", function() {
                           d3.select(this).transition()
                               .duration(400)
-                              .style("opacity", 0.4);})
+                              .style("opacity", 0.3);})
                       .append("g")
                           .attr("transform",
                                 "translate(" + (scree_svg_margin.left + 330) + "," +
@@ -271,7 +271,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
               .on("mouseout", function() {
                   d3.select(this).transition()
                       .duration(400)
-                      .style("opacity", 0.7);})
+                      .style("opacity", 0.5);})
                 .append("g")
                   .attr("transform", "translate(" + scatter_svg_margin.left + "," + scatter_svg_margin.top + ")");
 
