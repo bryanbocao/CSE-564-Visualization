@@ -50,16 +50,14 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       }
 
       .dot {
-          fill: #07575B;
-          stroke: #66A5AD;
-          fill-opacity: .7;
+          fill-opacity: .5;
       }
 
       .axis {
           font-size: 18px;
       }
       .title {
-          font-size: 18px;
+          font-size: 20px;
           background-color: #66A5AD;
       }
       .label {
@@ -133,7 +131,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
 
       // part3 scatter plot
       scatter_plot(vis_data.top2PACVectors_all_data_t, "All Data", my_colors[1]);
-      scatter_plot(vis_data.top2PACVectors_sampled_data_t, "Sampled Data", my_colors[2]);
+      scatter_plot(vis_data.top2PACVectors_sampled_data_t, "Sampled Data", my_colors[1]);
       // scatter_plot(vis_data.top2PACVectors_ss_data_t);
 
       // ===================== scree_plot -- start =====================
@@ -312,7 +310,8 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
                     .attr("cx", function(d) { return x(d[0]); })
                     .attr("cy", function(d) { return y(d[1]); })
                     .attr("class", "dot")
-                    .attr("r", 3);
+                    .attr("r", 3.5)
+                    .attr("fill", color);
 
       }
       // ===================== scatter_plot -- end =====================
