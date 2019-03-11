@@ -29,6 +29,7 @@ from sklearn import decomposition
 from sklearn import preprocessing
 from scipy.spatial.distance import cdist
 from sklearn.manifold import MDS
+from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -98,6 +99,8 @@ def index():
     # ================= MDS -- start ====================
     embedding_MDS_all_data_euclidean_t = myMDS(df_all_data_normalized, "euclidean", "All Data")
     embedding_MDS_sampled_data_euclidean_t = myMDS(df_sampled_data_normalized, "euclidean", "Sampled Data")
+    embedding_MDS_all_data_correlation_t = myMDS(df_all_data_normalized, "correlation", "All Data")
+    embedding_MDS_sampled_data_correlation_t = myMDS(df_sampled_data_normalized, "correlation", "Sampled Data")
     # ================= MDS -- end ====================
 
 
@@ -112,7 +115,9 @@ def index():
                 'top2PACVectors_sampled_data_t': top2PACVectors_sampled_data_t,
                 'top2PACVectors_ss_data_t': top2PACVectors_ss_data_t,
                 'embedding_MDS_all_data_euclidean_t': embedding_MDS_all_data_euclidean_t,
-                'embedding_MDS_sampled_data_euclidean_t': embedding_MDS_sampled_data_euclidean_t};
+                'embedding_MDS_sampled_data_euclidean_t': embedding_MDS_sampled_data_euclidean_t,
+                'embedding_MDS_all_data_correlation_t': embedding_MDS_all_data_correlation_t,
+                'embedding_MDS_sampled_data_correlation_t': embedding_MDS_sampled_data_correlation_t};
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)
@@ -263,6 +268,9 @@ def myMDS(data, dissimilarity, data_type):
         print("embedding_MDS_data_t.shape: ", embedding_MDS_data_t.shape)
         return embedding_MDS_data_t.tolist()
     else:
+        cosine_distance = 1 - cosine_similarity(data)
+        embedding = MDS(n_components=2, dissimilarity="precomputed")
+        embedding_MDS_data_t = embedding.fit_transform(cosine_distance)
         return embedding_MDS_data_t.tolist()
 # ================= MDS -- end ====================
 

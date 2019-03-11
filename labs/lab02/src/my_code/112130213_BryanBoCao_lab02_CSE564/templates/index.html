@@ -130,14 +130,15 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", "black");
 
       // part3 scatter plot
-      scatter_plot(vis_data.top2PACVectors_all_data_t, "Top 2 PCA Vectors: All Data", "Component0", "Component1", my_colors[1]);
-      scatter_plot(vis_data.top2PACVectors_sampled_data_t, "Top 2 PCA Vectors: Sampled Data", "Component0", "Component1", my_colors[1]);
+      scatter_plot(vis_data.top2PACVectors_all_data_t, "Top 2 PCA Vectors: All Data", "Component0", "Component1", my_colors[1], [-2, 2]);
+      scatter_plot(vis_data.top2PACVectors_sampled_data_t, "Top 2 PCA Vectors: Sampled Data", "Component0", "Component1", my_colors[1], [-2, 2]);
       // scatter_plot(vis_data.top2PACVectors_ss_data_t, "Top 2 PCA Vectors: Stratified Sampled Data", my_colors[2]);
 
       // part3 visualize the data via MDS (Euclidian & correlation distance) in 2D scatterplots
-      scatter_plot(vis_data.embedding_MDS_all_data_euclidean_t, "MDS (Euclidian): All Data", "", "", my_colors[0]);
-      scatter_plot(vis_data.embedding_MDS_sampled_data_euclidean_t, "MDS (Euclidian): Sampled Data", "", "", my_colors[0]);
-
+      scatter_plot(vis_data.embedding_MDS_all_data_euclidean_t, "MDS (Euclidian): All Data", "", "", my_colors[0], [-2, 2]);
+      scatter_plot(vis_data.embedding_MDS_sampled_data_euclidean_t, "MDS (Euclidian): Sampled Data", "", "", my_colors[0], [-2, 2]);
+      scatter_plot(vis_data.embedding_MDS_all_data_correlation_t, "MDS (Correlation): All Data", "", "", my_colors[0], [-0.5, 0.5]);
+      scatter_plot(vis_data.embedding_MDS_sampled_data_correlation_t, "MDS (Correlation): Sampled Data", "", "", my_colors[0], [-0.5, 0.5]);
 
       // ===================== scree_plot -- start =====================
       function scree_plot(data, title, color){
@@ -246,7 +247,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       // ===================== scree_plot -- end =====================
 
       // ===================== scatter_plot -- start =====================
-      function scatter_plot(data, title, x_axis_text, y_axis_text, color){
+      function scatter_plot(data, title, x_axis_text, y_axis_text, color, domain){
 
           var scatter_svg_margin = {top: 50, right: 50, bottom: 50, left: 50},
               width = 500 - scatter_svg_margin.left - scatter_svg_margin.right,
@@ -274,8 +275,8 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
                 .append("g")
                   .attr("transform", "translate(" + scatter_svg_margin.left + "," + scatter_svg_margin.top + ")");
 
-              x.domain([-2, 2])
-              y.domain([-2, 2])
+              x.domain(domain)
+              y.domain(domain)
 
               // Append x axis
               scatter_svg.append("g")
