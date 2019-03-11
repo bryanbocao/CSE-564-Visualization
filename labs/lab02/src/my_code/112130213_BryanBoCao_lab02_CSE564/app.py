@@ -96,7 +96,8 @@ def index():
     # ================= top2PCAVectors -- end ====================
 
     # ================= MDS -- start ====================
-    embedding_MDS_all_data_t = myMDS(df_all_data_normalized, "euclidean", "All Data")
+    embedding_MDS_all_data_euclidean_t = myMDS(df_all_data_normalized, "euclidean", "All Data")
+    embedding_MDS_sampled_data_euclidean_t = myMDS(df_sampled_data_normalized, "euclidean", "Sampled Data")
     # ================= MDS -- end ====================
 
 
@@ -110,7 +111,8 @@ def index():
                 'top2PACVectors_all_data_t': top2PACVectors_all_data_t,
                 'top2PACVectors_sampled_data_t': top2PACVectors_sampled_data_t,
                 'top2PACVectors_ss_data_t': top2PACVectors_ss_data_t,
-                'embedding_MDS_all_data_t': embedding_MDS_all_data_t};
+                'embedding_MDS_all_data_euclidean_t': embedding_MDS_all_data_euclidean_t,
+                'embedding_MDS_sampled_data_euclidean_t': embedding_MDS_sampled_data_euclidean_t};
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)

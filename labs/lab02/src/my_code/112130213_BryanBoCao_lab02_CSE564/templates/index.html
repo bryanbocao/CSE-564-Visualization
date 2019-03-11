@@ -127,7 +127,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       // scree plot
       scree_plot(vis_data.pca_all_data_explained_variance_ratio_, "All Data", my_colors[1]);
       scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, "Sampled Data", my_colors[2])
-      scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", "steelblue");
+      scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", "black");
 
       // part3 scatter plot
       scatter_plot(vis_data.top2PACVectors_all_data_t, "Top 2 PCA Vectors: All Data", "Component0", "Component1", my_colors[1]);
@@ -135,7 +135,9 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       // scatter_plot(vis_data.top2PACVectors_ss_data_t, "Top 2 PCA Vectors: Stratified Sampled Data", my_colors[2]);
 
       // part3 visualize the data via MDS (Euclidian & correlation distance) in 2D scatterplots
-      scatter_plot(vis_data.embedding_MDS_all_data_t, "MDS: All Data", "", "", my_colors[0]);
+      scatter_plot(vis_data.embedding_MDS_all_data_euclidean_t, "MDS (Euclidian): All Data", "", "", my_colors[0]);
+      scatter_plot(vis_data.embedding_MDS_sampled_data_euclidean_t, "MDS (Euclidian): Sampled Data", "", "", my_colors[0]);
+
 
       // ===================== scree_plot -- start =====================
       function scree_plot(data, title, color){
