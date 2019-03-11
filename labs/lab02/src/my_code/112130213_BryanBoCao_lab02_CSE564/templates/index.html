@@ -101,7 +101,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       // ###########################################################################
       // ####                Visualize Data from Backent                        ####
       // ###########################################################################
-      var vis_data = {{ data | safe }}
+      var vis_data = {{ data | safe }};
       console.log(vis_data);
       console.log(vis_data.pca_all_data_explained_variance_ratio_);
       console.log(vis_data.pca_sampled_data_explained_variance_ratio_);
@@ -130,9 +130,12 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", "steelblue");
 
       // part3 scatter plot
-      scatter_plot(vis_data.top2PACVectors_all_data_t, "All Data", my_colors[1]);
-      scatter_plot(vis_data.top2PACVectors_sampled_data_t, "Sampled Data", my_colors[1]);
-      // scatter_plot(vis_data.top2PACVectors_ss_data_t);
+      scatter_plot(vis_data.top2PACVectors_all_data_t, "Top 2 PCA Vectors: All Data", "Component0", "Component1", my_colors[1]);
+      scatter_plot(vis_data.top2PACVectors_sampled_data_t, "Top 2 PCA Vectors: Sampled Data", "Component0", "Component1", my_colors[1]);
+      // scatter_plot(vis_data.top2PACVectors_ss_data_t, "Top 2 PCA Vectors: Stratified Sampled Data", my_colors[2]);
+
+      // part3 visualize the data via MDS (Euclidian & correlation distance) in 2D scatterplots
+      scatter_plot(vis_data.embedding_MDS_all_data_t, "MDS: All Data", "", "", my_colors[0]);
 
       // ===================== scree_plot -- start =====================
       function scree_plot(data, title, color){
@@ -241,7 +244,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
       // ===================== scree_plot -- end =====================
 
       // ===================== scatter_plot -- start =====================
-      function scatter_plot(data, title, color){
+      function scatter_plot(data, title, x_axis_text, y_axis_text, color){
 
           var scatter_svg_margin = {top: 50, right: 50, bottom: 50, left: 50},
               width = 500 - scatter_svg_margin.left - scatter_svg_margin.right,
@@ -291,7 +294,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
                           "translate(" + (scatter_svg_margin.left + width - 70) + " ," +
                                     (height / 2 + 30) + ")")
                           .style("text-anchor", "middle")
-                          .text("Component0")
+                          .text(x_axis_text)
 
               // Append text to y axis
               scatter_svg.append("text")
@@ -300,7 +303,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
                             "translate(" + (width / 2) + " ," +
                                       (-18) + ")")
                             .style("text-anchor", "middle")
-                            .text("Component1")
+                            .text(y_axis_text)
 
               // Append title
               scatter_svg.append("text")

@@ -28,6 +28,7 @@ from sklearn import metrics
 from sklearn import decomposition
 from sklearn import preprocessing
 from scipy.spatial.distance import cdist
+from sklearn.manifold import MDS
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -82,13 +83,22 @@ def index():
     pca_ss_data, top3_attributes_i_ss_data_ls = myPCA(df_ss_data_normalized, "Stratified Sampled Data")
     # ================= PCA -- end ==================
 
+    # ======================== Task3 ========================
+    # Task 3: visualization (use dimension reduced data) (40 points)
+    # visualize the data projected into the top two PCA vectors via 2D scatterplot
+    # visualize the data via MDS (Euclidian & correlation distance) in 2D scatterplots
+    # visualize scatterplot matrix of the three highest PCA loaded attributes
 
     # ================= top2PCAVectors -- start ==================
     top2PACVectors_all_data_t = top2PCAVectors(df_all_data_normalized, "All Data")
     top2PACVectors_sampled_data_t = top2PCAVectors(df_sampled_data_normalized, "Sampled Data")
     top2PACVectors_ss_data_t = top2PCAVectors(df_ss_data_normalized, "Stratified Sampled Data")
-
     # ================= top2PCAVectors -- end ====================
+
+    # ================= MDS -- start ====================
+    embedding_MDS_all_data_t = myMDS(df_all_data_normalized, "euclidean", "All Data")
+    # ================= MDS -- end ====================
+
 
     # ========= Jsonify Data for Visualization in the Frontend =================
     # Wrap data into a single json file for frontend to visualize
@@ -99,7 +109,8 @@ def index():
                 'pca_ss_data_explained_variance_ratio_': pca_ss_data.explained_variance_ratio_.tolist(),
                 'top2PACVectors_all_data_t': top2PACVectors_all_data_t,
                 'top2PACVectors_sampled_data_t': top2PACVectors_sampled_data_t,
-                'top2PACVectors_ss_data_t': top2PACVectors_ss_data_t};
+                'top2PACVectors_ss_data_t': top2PACVectors_ss_data_t,
+                'embedding_MDS_all_data_t': embedding_MDS_all_data_t};
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)
@@ -241,6 +252,17 @@ def top2PCAVectors(df_data, data_type):
     top2PACVectors_data_t = pca.transform(df_data).tolist()
     return top2PACVectors_data_t
 # ================= top2PCAVectors -- end ====================
+
+# ================= MDS -- start ====================
+def myMDS(data, dissimilarity, data_type):
+    if (dissimilarity == "euclidean"):
+        embedding = MDS(n_components=2, dissimilarity="euclidean")
+        embedding_MDS_data_t = embedding.fit_transform(data)
+        print("embedding_MDS_data_t.shape: ", embedding_MDS_data_t.shape)
+        return embedding_MDS_data_t.tolist()
+    else:
+        return embedding_MDS_data_t.tolist()
+# ================= MDS -- end ====================
 
 
 if __name__ == "__main__":
