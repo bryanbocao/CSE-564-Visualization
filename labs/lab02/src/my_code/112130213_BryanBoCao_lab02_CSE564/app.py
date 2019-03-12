@@ -81,9 +81,9 @@ def index():
     # obtain the three attributes with highest PCA loadings
 
     # ================= PCA -- start ==================
-    pca_all_data, top3_attributes_i_all_data_ls = myPCA(df_all_data_normalized, "All Data")
-    pca_sampled_data, top3_attributes_i_sampled_data_ls = myPCA(df_sampled_data_normalized, "Sampled Data")
-    pca_ss_data, top3_attributes_i_ss_data_ls = myPCA(df_ss_data_normalized, "Stratified Sampled Data")
+    pca_all_data, top3_attributes_i_all_data_ls = my_PCA(df_all_data_normalized, "All Data")
+    pca_sampled_data, top3_attributes_i_sampled_data_ls = my_PCA(df_sampled_data_normalized, "Sampled Data")
+    pca_ss_data, top3_attributes_i_ss_data_ls = my_PCA(df_ss_data_normalized, "Stratified Sampled Data")
     # ================= PCA -- end ==================
 
     # ======================== Task3 ========================
@@ -92,24 +92,24 @@ def index():
     # visualize the data via MDS (Euclidian & correlation distance) in 2D scatterplots
     # visualize scatterplot matrix of the three highest PCA loaded attributes
 
-    # ================= top2PCAVectors -- start ==================
-    top2PACVectors_all_data_t = top2PCAVectors(df_all_data_normalized, "All Data")
-    top2PACVectors_sampled_data_t = top2PCAVectors(df_sampled_data_normalized, "Sampled Data")
-    top2PACVectors_ss_data_t = top2PCAVectors(df_ss_data_normalized, "Stratified Sampled Data")
-    # ================= top2PCAVectors -- end ====================
+    # ================= top2_PCA_Vectors -- start ==================
+    top2PACVectors_all_data_t = top2_PCA_Vectors(df_all_data_normalized, "All Data")
+    top2PACVectors_sampled_data_t = top2_PCA_Vectors(df_sampled_data_normalized, "Sampled Data")
+    top2PACVectors_ss_data_t = top2_PCA_Vectors(df_ss_data_normalized, "Stratified Sampled Data")
+    # ================= top2_PCA_Vectors -- end ====================
 
     # ================= MDS -- start ====================
-    embedding_MDS_all_data_euclidean_t = myMDS(df_all_data_normalized, "euclidean", "All Data")
-    embedding_MDS_sampled_data_euclidean_t = myMDS(df_sampled_data_normalized, "euclidean", "Sampled Data")
-    embedding_MDS_all_data_correlation_t = myMDS(df_all_data_normalized, "correlation", "All Data")
-    embedding_MDS_sampled_data_correlation_t = myMDS(df_sampled_data_normalized, "correlation", "Sampled Data")
+    embedding_MDS_all_data_euclidean_t = my_MDS(df_all_data_normalized, "euclidean", "All Data")
+    embedding_MDS_sampled_data_euclidean_t = my_MDS(df_sampled_data_normalized, "euclidean", "Sampled Data")
+    embedding_MDS_all_data_correlation_t = my_MDS(df_all_data_normalized, "correlation", "All Data")
+    embedding_MDS_sampled_data_correlation_t = my_MDS(df_sampled_data_normalized, "correlation", "Sampled Data")
     # ================= MDS -- end ====================
 
     # ================= Scatter Plot Matrix -- start ====================
     scatterplot_matrix_top3_attributes_all_data, top3_attributes_all_data_ls = \
-        computeScatterPlotMatrix(df_all_data_normalized, top3_attributes_i_all_data_ls)               # shape (9, n_sample, n_attributes) -- (9, 777, 3)
+        compute_scatterplot_matrix(df_all_data_normalized, top3_attributes_i_all_data_ls)               # shape (9, n_sample, n_attributes) -- (9, 777, 3)
     scatterplot_matrix_top3_attributes_sampled_data, top3_attributes_sampled_data_ls = \
-        computeScatterPlotMatrix(df_sampled_data_normalized, top3_attributes_i_sampled_data_ls)   # shape (9, n_sample, n_attributes) -- (9, 388, 3)
+        compute_scatterplot_matrix(df_sampled_data_normalized, top3_attributes_i_sampled_data_ls)   # shape (9, n_sample, n_attributes) -- (9, 388, 3)
     # ================= Scatter Plot Matrix -- end ====================
 
     # ========= Jsonify Data for Visualization in the Frontend =================
@@ -224,8 +224,8 @@ def stratified_sample(df_all_data):
     return df_ss_data, elbow_k
 # ================= stratified sample -- end ==================
 
-# ================= myPCA -- start ==================
-def myPCA(df_data, data_type):
+# ================= my_PCA -- start ==================
+def my_PCA(df_data, data_type):
 
     # Remove cluster for Stratified Sampled Data
     if data_type == "Stratified Sampled Data":
@@ -270,18 +270,18 @@ def myPCA(df_data, data_type):
         print("    ", df_data.columns[top3_attributes_i_ls[i]])
     print("===================================")
     return pca_data, top3_attributes_i_ls
-# ================= myPCA -- start ==================
+# ================= my_PCA -- start ==================
 
-# ================= top2PCAVectors -- start ==================
-def top2PCAVectors(df_data, data_type):
+# ================= top2_PCA_Vectors -- start ==================
+def top2_PCA_Vectors(df_data, data_type):
     pca = decomposition.PCA(n_components=2)
     pca.fit(df_data)
     top2PACVectors_data_t = pca.transform(df_data).tolist()
     return top2PACVectors_data_t
-# ================= top2PCAVectors -- end ====================
+# ================= top2_PCA_Vectors -- end ====================
 
 # ================= MDS -- start ====================
-def myMDS(data, dissimilarity, data_type):
+def my_MDS(data, dissimilarity, data_type):
     print("Computing MDS data matrix... Please wait.")
     if (dissimilarity == "euclidean"):
         embedding = MDS(n_components=2, dissimilarity="euclidean")
@@ -296,7 +296,7 @@ def myMDS(data, dissimilarity, data_type):
 # ================= MDS -- end ====================
 
 # ================= Scatter Plot Matrix -- start ====================
-def computeScatterPlotMatrix(df, top3_attributes_i_ls):
+def compute_scatterplot_matrix(df, top3_attributes_i_ls):
     df_top3_attributes = df.iloc[:, top3_attributes_i_ls]
     scatterplot_matrix_3x3 = []
     for i in range(3):
