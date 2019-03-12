@@ -280,7 +280,7 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
           } else if (plot_type == "scatter matrix") {
               // scatter matrix
               scatter_svg_margin = {top: 20, right: 20, bottom: 20, left: 20};
-              width = (window.innerWidth / 4) - scatter_svg_margin.left - scatter_svg_margin.right;
+              width = (window.innerWidth / 4) - scatter_svg_margin.left - scatter_svg_margin.right + 3;
               height = (window.innerWidth / 4) - scatter_svg_margin.top - scatter_svg_margin.bottom;
           }
 
@@ -299,8 +299,6 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
               // scatter matrix
               x_axis_y = height;
               y_axis_x = 0;
-              // width = 50;
-              // height = 50;
           }
 
           var scatter_svg = d3.select(div_id).append("svg")
@@ -315,7 +313,7 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
                       .duration(400)
                       .style("opacity", 0.5);})
                 .append("g")
-                  .attr("transform", "translate(" + scatter_svg_margin.left + "," + scatter_svg_margin.top + ")");
+                  .attr("transform", "translate(" + (scatter_svg_margin.left + 3) + "," + scatter_svg_margin.top + ")");
 
             x.domain(domain)
             y.domain(domain)
