@@ -92,6 +92,8 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
     <div id="task3_scatter_div_id" align="center"></div>
     <hr/>
     <div id="task3_scatter_matrix_all_data_div_id" align="center"></div>
+    <br/>
+    <div><center><button class="btn btn-primary">Scatter Matrix for All Data</button></center></div>
     <hr/>
     <div id="task3_scatter_matrix_sampled_data_div_id" align="center"></div>
   </div>
@@ -278,8 +280,8 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
           } else if (plot_type == "scatter matrix") {
               // scatter matrix
               scatter_svg_margin = {top: 20, right: 20, bottom: 20, left: 20};
-              width = (window.innerWidth / 3) - scatter_svg_margin.left - scatter_svg_margin.right;
-              height = (window.innerWidth / 3) - scatter_svg_margin.top - scatter_svg_margin.bottom;
+              width = (window.innerWidth / 4) - scatter_svg_margin.left - scatter_svg_margin.right;
+              height = (window.innerWidth / 4) - scatter_svg_margin.top - scatter_svg_margin.bottom;
           }
 
           var x = d3.scaleLinear()
@@ -297,7 +299,8 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
               // scatter matrix
               x_axis_y = height;
               y_axis_x = 0;
-
+              // width = 50;
+              // height = 50;
           }
 
           var scatter_svg = d3.select(div_id).append("svg")
@@ -379,6 +382,7 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
                   scatter_plot(plot_type, data[ii * 3 + jj], title, x_axis_text, y_axis_text, color, domain, pos, div_id)
               }
           }
+
       }
       // ===================== scatter_matrix_plot -- end =====================
 
