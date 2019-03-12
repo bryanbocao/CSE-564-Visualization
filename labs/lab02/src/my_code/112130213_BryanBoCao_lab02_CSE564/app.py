@@ -104,8 +104,10 @@ def index():
     # ================= MDS -- end ====================
 
     # ================= Scatter Plot Matrix -- start ====================
-    scatterplot_matrix_top3_attributes_all_data = computeScatterPlotMatrix(df_all_data_normalized, top3_attributes_i_all_data_ls)               # shape (9, n_sample, n_attributes) -- (9, 777, 3)
-    scatterplot_matrix_top3_attributes_sampled_data = computeScatterPlotMatrix(df_sampled_data_normalized, top3_attributes_i_sampled_data_ls)   # shape (9, n_sample, n_attributes) -- (9, 388, 3)
+    scatterplot_matrix_top3_attributes_all_data, top3_attributes_all_data_ls = \
+        computeScatterPlotMatrix(df_all_data_normalized, top3_attributes_i_all_data_ls)               # shape (9, n_sample, n_attributes) -- (9, 777, 3)
+    scatterplot_matrix_top3_attributes_sampled_data, top3_attributes_sampled_data_ls = \
+        computeScatterPlotMatrix(df_sampled_data_normalized, top3_attributes_i_sampled_data_ls)   # shape (9, n_sample, n_attributes) -- (9, 388, 3)
     # ================= Scatter Plot Matrix -- end ====================
 
     # ========= Jsonify Data for Visualization in the Frontend =================
@@ -123,7 +125,9 @@ def index():
                 'embedding_MDS_all_data_correlation_t': embedding_MDS_all_data_correlation_t,
                 'embedding_MDS_sampled_data_correlation_t': embedding_MDS_sampled_data_correlation_t,
                 'scatterplot_matrix_top3_attributes_all_data': scatterplot_matrix_top3_attributes_all_data,
-                'scatterplot_matrix_top3_attributes_sampled_data': scatterplot_matrix_top3_attributes_sampled_data};
+                'top3_attributes_all_data_ls': top3_attributes_all_data_ls,
+                'scatterplot_matrix_top3_attributes_sampled_data': scatterplot_matrix_top3_attributes_sampled_data,
+                'top3_attributes_sampled_data_ls': top3_attributes_sampled_data_ls};
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)
@@ -285,7 +289,7 @@ def computeScatterPlotMatrix(df, top3_attributes_i_ls):
     for i in range(3):
         for j in range(3):
             scatterplot_matrix_3x3.append(df_top3_attributes.iloc[:, [i, 2 - j]].values.tolist())
-    return scatterplot_matrix_3x3
+    return scatterplot_matrix_3x3, df_top3_attributes.columns.tolist()
 # ================= Scatter Plot Matrix -- end ====================
 
 

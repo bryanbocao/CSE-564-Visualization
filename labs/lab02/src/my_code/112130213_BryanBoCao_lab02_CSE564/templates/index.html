@@ -148,15 +148,17 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
       // scatter_plot("scatter", vis_data.top2PACVectors_ss_data_t, "Top 2 PCA Vectors: Stratified Sampled Data", my_colors[2]);
 
       // Task3 visualize the data via MDS (Euclidian & correlation distance) in 2D scatterplots
-      scatter_plot("scatter", vis_data.embedding_MDS_all_data_euclidean_t, "MDS (Euclidian): All Data", "", "", my_colors[1], [-2, 2], pos, "#task3_scatter_div_id");
-      scatter_plot("scatter", vis_data.embedding_MDS_sampled_data_euclidean_t, "MDS (Euclidian): Sampled Data", "", "", my_colors[1], [-2, 2], pos, "#task3_scatter_div_id");
-      scatter_plot("scatter", vis_data.embedding_MDS_all_data_correlation_t, "MDS (Correlation): All Data", "", "", my_colors[2], [-0.5, 0.5], pos, "#task3_scatter_div_id");
-      scatter_plot("scatter", vis_data.embedding_MDS_sampled_data_correlation_t, "MDS (Correlation): Sampled Data", "", "", my_colors[2], [-0.5, 0.5], pos, "#task3_scatter_div_id");
+      scatter_plot("scatter", vis_data.embedding_MDS_all_data_euclidean_t, "MDS (Euclidian): All Data", "Component0", "Component1", my_colors[1], [-2, 2], pos, "#task3_scatter_div_id");
+      scatter_plot("scatter", vis_data.embedding_MDS_sampled_data_euclidean_t, "MDS (Euclidian): Sampled Data", "Component0", "Component1", my_colors[1], [-2, 2], pos, "#task3_scatter_div_id");
+      scatter_plot("scatter", vis_data.embedding_MDS_all_data_correlation_t, "MDS (Correlation): All Data", "Component0", "Component1", my_colors[2], [-0.5, 0.5], pos, "#task3_scatter_div_id");
+      scatter_plot("scatter", vis_data.embedding_MDS_sampled_data_correlation_t, "MDS (Correlation): Sampled Data", "Component0", "Component1", my_colors[2], [-0.5, 0.5], pos, "#task3_scatter_div_id");
 
       // Task3 visualize scatterplot matrix of the three highest PCA loaded attributes
       var scatterplot_matrix_top3_attributes_all_data = vis_data.scatterplot_matrix_top3_attributes_all_data;         // shape (9, n_sample, n_attributes) -- (9, 777, 2)
+      var top3_attributes_all_data_ls = vis_data.top3_attributes_all_data_ls; // list of top 3 attributes names
       var scatterplot_matrix_top3_attributes_sampled_data = vis_data.scatterplot_matrix_top3_attributes_sampled_data; // shape (9, n_sample, n_attributes) -- (9, 388, 2)
-      scatter_matrix_plot("scatter matrix", scatterplot_matrix_top3_attributes_all_data, "", "", "", my_colors[1], [0, 1.3], "#task3_scatter_matrix_all_data_div_id")
+      var top3_attributes_sampled_data_ls = vis_data.top3_attributes_sampled_data_ls; // list of top 3 attributes names
+      scatter_matrix_plot("scatter matrix", scatterplot_matrix_top3_attributes_all_data, top3_attributes_all_data_ls, "", "", "", my_colors[1], [0, 1.3], "#task3_scatter_matrix_all_data_div_id")
 
 
       // ===================== scree_plot -- start =====================
@@ -293,12 +295,20 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
           var y_axis = d3.axisLeft(y);
 
           var x_axis_y = height / 2,
-              y_axis_x = width / 2;
+              y_axis_x = width / 2,
+              x_axis_text_x = scatter_svg_margin.left + width - 70,
+              x_axis_text_y = height / 2 + 30,
+              y_axis_text_x = width / 2,
+              y_axis_text_y = -18;
+
 
           if (plot_type == "scatter matrix") {
-              // scatter matrix
               x_axis_y = height;
               y_axis_x = 0;
+              x_axis_text_x = width - 40,
+              x_axis_text_y = height - 8,
+              y_axis_text_x = 45,
+              y_axis_text_y = 3;
           }
 
           var scatter_svg = d3.select(div_id).append("svg")
@@ -330,12 +340,14 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
                   .attr("transform", "translate(" + y_axis_x + ",0)") // center of the plot
                   .call(y_axis);
 
+
+
             // Append text to x axis
             scatter_svg.append("text")
                     .attr("class", "x axis")
                     .attr("transform",
-                          "translate(" + (scatter_svg_margin.left + width - 70) + " ," +
-                                    (height / 2 + 30) + ")")
+                          "translate(" + x_axis_text_x + " ," +
+                                    x_axis_text_y + ")")
                           .style("text-anchor", "middle")
                           .text(x_axis_text)
 
@@ -343,8 +355,8 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
             scatter_svg.append("text")
                       .attr("class", "y axis")
                       .attr("transform",
-                            "translate(" + (width / 2) + " ," +
-                                      (-18) + ")")
+                            "translate(" + y_axis_text_x + " ," +
+                                      y_axis_text_y + ")")
                             .style("text-anchor", "middle")
                             .text(y_axis_text)
 
@@ -371,12 +383,14 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
       // ===================== scatter_plot -- end =====================
 
       // ===================== scatter_matrix_plot -- start =====================
-      function scatter_matrix_plot(plot_type, data, title, x_axis_text, y_axis_text, color, domain, div_id){
+      function scatter_matrix_plot(plot_type, data, top3_attributes_ls, title, x_axis_text, y_axis_text, color, domain, div_id){
 
           var pos = {i:0, n_i:0, j:0, n_j:0};
           // data should be in shape of (9, n_sample, 2)
           for (var ii = 0; ii < 3; ++ii) {
               for (var jj = 0; jj < 3; ++jj) {
+                  y_axis_text = top3_attributes_ls[ii];
+                  x_axis_text = top3_attributes_ls[2 - jj];
                   scatter_plot(plot_type, data[ii * 3 + jj], title, x_axis_text, y_axis_text, color, domain, pos, div_id)
               }
           }
