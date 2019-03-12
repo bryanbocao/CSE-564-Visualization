@@ -32,7 +32,6 @@ from sklearn.manifold import MDS
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import matplotlib.pyplot as plt
-import random
 
 app = Flask(__name__)
 
@@ -71,7 +70,7 @@ def index():
 
     # ================= stratified sampling ==================
     # df_ss_data = stratified_sample(df_all_data)
-    df_ss_data_normalized = stratified_sample(df_all_data_normalized)
+    df_ss_data_normalized, elbow_k = stratified_sample(df_all_data_normalized)
 
     # ======================== Task2 ========================
     # Task 2: dimension reduction (use decimated data) (30 points)
@@ -117,7 +116,8 @@ def index():
     # Wrap data into a single json file for frontend to visualize
     # chart_data = df_all_data.to_dict()
     # chart_data = json.dumps(chart_data, indent=4)
-    vis_data = {'pca_all_data_explained_variance_ratio_': pca_all_data.explained_variance_ratio_.tolist(),
+    vis_data = {'elbow_k': elbow_k,
+                'pca_all_data_explained_variance_ratio_': pca_all_data.explained_variance_ratio_.tolist(),
                 'pca_sampled_data_explained_variance_ratio_': pca_sampled_data.explained_variance_ratio_.tolist(),
                 'pca_ss_data_explained_variance_ratio_': pca_ss_data.explained_variance_ratio_.tolist(),
                 'top2PACVectors_all_data_t': top2PACVectors_all_data_t,
@@ -178,10 +178,10 @@ def stratified_sample(df_all_data):
         print("k: %d, distortion: %.4f, dec: %0.4f" % (k, distortion, dec))
 
     elbow_k = 0
-    for i in range(2, len(decs) + 1):
-        diff = decs[i + 1] - decs[i]
-        if diff < 0.012:
-            elbow_k = i
+    for i in range(0, len(decs) + 1):
+        diff = np.abs(decs[i + 1] - decs[i])
+        if diff < 0.05:
+            elbow_k = i + 1
             break
     print("elbow_k: %d" % elbow_k)
 
@@ -221,7 +221,7 @@ def stratified_sample(df_all_data):
     print("Number of dimension of df_ss_data: %d" % len(df_ss_data.columns))
     df_ss_data.columns = ['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
     	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate', 'Cluster']
-    return df_ss_data
+    return df_ss_data, elbow_k
 # ================= stratified sample -- end ==================
 
 # ================= myPCA -- start ==================
@@ -253,7 +253,8 @@ def myPCA(df_data, data_type):
     for j in range(len(pca_data_components_[0])):
         attribute_loading = 0
         for i in range(len(pca_data_components_)):
-            attribute_loading += np.abs(pca_data_components_[i][j])
+            attribute_loading += np.square(pca_data_components_[i][j]) # square sum
+            # attribute_loading += np.abs(pca_data_components_[i][j])
         attribute_loadings.append(attribute_loading)
     print("attribute_loadings: ", attribute_loadings)
     attribute_loadings_sorted = attribute_loadings.copy()

@@ -58,6 +58,11 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
           fill-opacity: .5;
       }
 
+      .elbow_dot {
+          fill-opacity: .8;
+          fill: #DC143C;
+      }
+
       .x_axis {
           font-size: 18px;
       }
@@ -184,9 +189,9 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
         var y_scale = d3.scaleLinear().range([height, 0]);
 
         // scree plot
-        scree_plot(vis_data.pca_all_data_explained_variance_ratio_, "All Data", my_colors[0]);
-        scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, "Sampled Data", my_colors[1])
-        scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", my_colors[2]);
+        scree_plot(vis_data.pca_all_data_explained_variance_ratio_, vis_data.elbow_k, "All Data", my_colors[0]);
+        scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, vis_data.elbow_k, "Sampled Data", my_colors[1])
+        scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, vis_data.elbow_k, "Stratified Sampled Data", my_colors[2]);
 
         // Task3 scatter plot
         var pos = {i:0, n_i:0, j:0, n_j:0}; // position of the scatterplot in scatterplot matrix. All zeros means one scatter plot, not for scatter plot matrix.
@@ -212,7 +217,7 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
         // ####                           Plot Functions                          ####
         // ###########################################################################
         // ===================== scree_plot -- start =====================
-        function scree_plot(data, title, color){
+        function scree_plot(data, elbow_k, title, color){
 
             // Scale the range of the data
             // Apply margin convention
@@ -315,6 +320,12 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
                     .attr("class", "dot remove")
                     .attr("r", 6);
 
+            // Mark the elbow_k
+            scree_svg.append("circle")
+                      .attr("cx", x_scale(elbow_k))
+                      .attr("cy", y_scale(data[elbow_k]))
+                      .attr("class", "elbow_dot remove")
+                      .attr("r", 11);
         }
         // ===================== scree_plot -- end =====================
 
@@ -356,10 +367,10 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
             if (plot_type == "scatter matrix") {
                 x_axis_y = height;
                 y_axis_x = 0;
-                x_axis_text_x = width - 40,
+                x_axis_text_x = width - 48,
                 x_axis_text_y = height - 8,
                 y_axis_text_x = 45,
-                y_axis_text_y = 3;
+                y_axis_text_y = 18;
             }
 
             var scatter_svg = d3.select(div_id).append("svg")
