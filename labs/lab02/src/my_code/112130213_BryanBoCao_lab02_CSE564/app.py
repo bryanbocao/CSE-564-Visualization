@@ -104,10 +104,9 @@ def index():
     # ================= MDS -- end ====================
 
     # ================= Scatter Plot Matrix -- start ====================
-    scatterplot_matrix_all_data = computeScatterPlotMatrix(df_all_data_normalized, top3_attributes_i_all_data_ls)
-    scatterplot_matrix_sampled_data = computeScatterPlotMatrix(df_sampled_data_normalized, top3_attributes_i_sampled_data_ls)
+    scatterplot_matrix_top3_attributes_all_data = computeScatterPlotMatrix(df_all_data_normalized, top3_attributes_i_all_data_ls)               # shape (9, n_sample, n_attributes) -- (9, 777, 3)
+    scatterplot_matrix_top3_attributes_sampled_data = computeScatterPlotMatrix(df_sampled_data_normalized, top3_attributes_i_sampled_data_ls)   # shape (9, n_sample, n_attributes) -- (9, 388, 3)
     # ================= Scatter Plot Matrix -- end ====================
-
 
     # ========= Jsonify Data for Visualization in the Frontend =================
     # Wrap data into a single json file for frontend to visualize
@@ -123,8 +122,8 @@ def index():
                 'embedding_MDS_sampled_data_euclidean_t': embedding_MDS_sampled_data_euclidean_t,
                 'embedding_MDS_all_data_correlation_t': embedding_MDS_all_data_correlation_t,
                 'embedding_MDS_sampled_data_correlation_t': embedding_MDS_sampled_data_correlation_t,
-                'scatterplot_matrix_all_data': scatterplot_matrix_all_data,
-                'scatterplot_matrix_sampled_data': scatterplot_matrix_sampled_data};
+                'scatterplot_matrix_top3_attributes_all_data': scatterplot_matrix_top3_attributes_all_data,
+                'scatterplot_matrix_top3_attributes_sampled_data': scatterplot_matrix_top3_attributes_sampled_data};
 
     # vis_data = jsonify(vis_data) # Should be a json string
     return render_template("index.html", data=vis_data)
@@ -134,8 +133,6 @@ def index():
 def random_sampling(df_all_data):
     total_n_sample = int(len(df_all_data) / 2) # sample half of the data
     df_sampled_data = df_all_data.sample(n=total_n_sample)
-    # print("df_sampled_data:")
-    # print(df_sampled_data)
     print("Number of instance in df_sampled_data: %d" % len(df_sampled_data))
     print("Number of dimension of df_sampled_data: %d" % len(df_sampled_data.columns))
     df_sampled_data.columns = ['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
@@ -284,7 +281,11 @@ def myMDS(data, dissimilarity, data_type):
 # ================= Scatter Plot Matrix -- start ====================
 def computeScatterPlotMatrix(df, top3_attributes_i_ls):
     df_top3_attributes = df.iloc[:, top3_attributes_i_ls]
-    return df_top3_attributes.values.tolist()
+    scatterplot_matrix_3x3 = []
+    for i in range(3):
+        for j in range(3):
+            scatterplot_matrix_3x3.append(df_top3_attributes.iloc[:, [i, 2 - j]].values.tolist())
+    return scatterplot_matrix_3x3
 # ================= Scatter Plot Matrix -- end ====================
 
 
