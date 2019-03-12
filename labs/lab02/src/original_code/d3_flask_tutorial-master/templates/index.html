@@ -113,34 +113,32 @@ function updateData() {
     // $.post("", {'data': 'received'}, function(data_infunc){
       // console.log({data_infunc})
       $.post("", {'data': 'received'}, function(data_infunc){
-      data2 = JSON.parse(data_infunc.chart_data)
-      console.log(data2);
-      data2.forEach(function(d) {
-      d.date = parseDate(d.date);
-      d.close = +d.close;
-      });
+          data2 = JSON.parse(data_infunc.chart_data)
+          console.log(data2);
+          data2.forEach(function(d) {
+          d.date = parseDate(d.date);
+          d.close = +d.close;
+          });
 
-      //console.log(data2);
-      // Scale the range of the data again
-    	x.domain(d3.extent(data2, function(d) { return d.date; }));
-	    y.domain([0, d3.max(data2, function(d) { return d.close; })]);
+          //console.log(data2);
+          // Scale the range of the data again
+        	x.domain(d3.extent(data2, function(d) { return d.date; }));
+    	    y.domain([0, d3.max(data2, function(d) { return d.close; })]);
 
-    // Select the section we want to apply our changes to
-    var svg = d3.select("body").transition();
-    //
-    // // Make the changes
-        svg.select(".line")   // change the line
-            .duration(750)
-            .attr("d", valueline(data2));
-        svg.select(".x.axis") // change the x axis
-            .duration(750)
-            .call(xAxis);
-        svg.select(".y.axis") // change the y axis
-            .duration(750)
-            .call(yAxis);
-    })
-
-
+        // Select the section we want to apply our changes to
+        var svg = d3.select("body").transition();
+        //
+        // // Make the changes
+            svg.select(".line")   // change the line
+                .duration(750)
+                .attr("d", valueline(data2));
+            svg.select(".x.axis") // change the x axis
+                .duration(750)
+                .call(xAxis);
+            svg.select(".y.axis") // change the y axis
+                .duration(750)
+                .call(yAxis);
+       })
 
 }
 

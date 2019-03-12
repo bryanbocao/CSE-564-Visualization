@@ -46,31 +46,35 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
 
       .line {
           fill: none;
-          /* stroke: #66A5AD; */
           stroke-width: 5;
       }
 
       .overlay {
-        fill: #07575B;
-        pointer-events: all;
+          fill: #07575B;
+          pointer-events: all;
       }
 
       .dot {
           fill-opacity: .5;
       }
 
-      .axis {
+      .x_axis {
           font-size: 18px;
       }
+
+      .y_axis {
+          font-size: 18px;
+      }
+
       .title {
           font-size: 20px;
           background-color: #66A5AD;
       }
+
       .label {
           font-size: 18px;
           background-color: #66A5AD;
       }
-
     </style>
     <!-- load the d3.js library -->
     <script src="http://d3js.org/d3.v5.min.js"></script>
@@ -87,317 +91,372 @@ https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
 
 <div class="container-fluid well">
   <div id="canvas">
+
     <div id="task2_scree_div_id" align="center"></div>
+    <br/>
+    <div><center><button class="btn btn-primary" onclick="post_new_request()">Resample Data</button></center></div>
     <hr/>
+
     <div id="task3_scatter_div_id" align="center"></div>
+    <br/>
+    <div><center><button class="btn btn-primary" onclick="post_new_request()">Resample Data</button></center></div>
+
     <hr/>
+
     <div id="task3_scatter_matrix_all_data_div_id" align="center"></div>
     <br/>
-    <div><center><button class="btn btn-primary">Scatter Matrix for All Data</button></center></div>
+    <div><center><span class="label label-default">Scatter Matrix for All Data</span></center></div>
+    <br/>
+    <div><center><button class="btn btn-primary" onclick="post_new_request()">Resample Data</button></center></div>
+
     <hr/>
+
     <div id="task3_scatter_matrix_sampled_data_div_id" align="center"></div>
-    <div><center><button class="btn btn-primary">Scatter Matrix for Sampled Data</button></center></div>
+    <br/>
+    <div><center><span class="label label-default">Scatter Matrix for Sampled Data</span></center></div>
+    <br/>
+    <div><center><button class="btn btn-primary" onclick="post_new_request()">Resample Data</button></center></div>
+
   </div>
 </div><!-- end of <div class="container-fluid well"> -->
 
   <div id="canvas_script">
     <script>
-      // ###########################################################################
-      // ####                          parameters                               ####
-      // ###########################################################################
-      var curr_bar_w = -10; // initial value
-      var max_bar_w = 70, min_bar_w = 10;
-      var w = window.innerWidth, h = window.innerHeight - 450;
-      var canvas_w = w - 20, canvas_h = h - 320;
-      var my_colors = ["#58A437", "#391C54", "#24446A", "#143933", "#311D11"];
 
-      // ###########################################################################
-      // ####                Visualize Data from Backent                        ####
-      // ###########################################################################
       var vis_data = {{ data | safe }};
-      console.log(vis_data);
-      console.log(vis_data.pca_all_data_explained_variance_ratio_);
-      console.log(vis_data.pca_sampled_data_explained_variance_ratio_);
-      console.log(vis_data.pca_ss_data_explained_variance_ratio_);
 
-      // canvas
-      // main area to display all different kinds of charts
-      var canvas = d3.select("#canvas")
-                      .append("svg")
-                      .attr("width", canvas_w)
-                      .attr("height", canvas_h);
+      // ===================== post_new_request -- start =====================
+      function post_new_request() {
+          d3.selectAll(".remove")
+              .transition()
+              .duration(300)
+              .style("opacity", 0.3);
 
-      // Code base from TA
-      // Set the dimensions of the canvas / graph
-      var margin = {top: 30, right: 20, bottom: 30, left: 50},
-                    width = 600 - margin.left - margin.right,
-                    height = 270 - margin.top - margin.bottom;
-
-      // Set the ranges
-      var x_scale = d3.scaleLinear().range([0, width]);
-      var y_scale = d3.scaleLinear().range([height, 0]);
-
-      // scree plot
-      scree_plot(vis_data.pca_all_data_explained_variance_ratio_, "All Data", my_colors[0]);
-      scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, "Sampled Data", my_colors[1])
-      scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", my_colors[2]);
-
-      // Task3 scatter plot
-      var pos = {i:0, n_i:0, j:0, n_j:0}; // position of the scatterplot in scatterplot matrix. All zeros means one scatter plot, not for scatter plot matrix.
-      scatter_plot("scatter", vis_data.top2PACVectors_all_data_t, "Top 2 PCA Vectors: All Data", "Component0", "Component1", my_colors[0], [-2, 2], pos, "#task3_scatter_div_id");
-      scatter_plot("scatter", vis_data.top2PACVectors_sampled_data_t, "Top 2 PCA Vectors: Sampled Data", "Component0", "Component1", my_colors[0], [-2, 2], pos, "#task3_scatter_div_id");
-      // scatter_plot("scatter", vis_data.top2PACVectors_ss_data_t, "Top 2 PCA Vectors: Stratified Sampled Data", my_colors[2]);
-
-      // Task3 visualize the data via MDS (Euclidian & correlation distance) in 2D scatterplots
-      scatter_plot("scatter", vis_data.embedding_MDS_all_data_euclidean_t, "MDS (Euclidian): All Data", "Component0", "Component1", my_colors[1], [-2, 2], pos, "#task3_scatter_div_id");
-      scatter_plot("scatter", vis_data.embedding_MDS_sampled_data_euclidean_t, "MDS (Euclidian): Sampled Data", "Component0", "Component1", my_colors[1], [-2, 2], pos, "#task3_scatter_div_id");
-      scatter_plot("scatter", vis_data.embedding_MDS_all_data_correlation_t, "MDS (Correlation): All Data", "Component0", "Component1", my_colors[2], [-0.5, 0.5], pos, "#task3_scatter_div_id");
-      scatter_plot("scatter", vis_data.embedding_MDS_sampled_data_correlation_t, "MDS (Correlation): Sampled Data", "Component0", "Component1", my_colors[2], [-0.5, 0.5], pos, "#task3_scatter_div_id");
-
-      // Task3 visualize scatterplot matrix of the three highest PCA loaded attributes
-      var scatterplot_matrix_top3_attributes_all_data = vis_data.scatterplot_matrix_top3_attributes_all_data;         // shape (9, n_sample, n_attributes) -- (9, 777, 2)
-      var top3_attributes_all_data_ls = vis_data.top3_attributes_all_data_ls; // list of top 3 attributes names
-      var scatterplot_matrix_top3_attributes_sampled_data = vis_data.scatterplot_matrix_top3_attributes_sampled_data; // shape (9, n_sample, n_attributes) -- (9, 388, 2)
-      var top3_attributes_sampled_data_ls = vis_data.top3_attributes_sampled_data_ls; // list of top 3 attributes names
-      scatter_matrix_plot("scatter matrix", scatterplot_matrix_top3_attributes_all_data, top3_attributes_all_data_ls, "", "", "", my_colors[3], [0, 1.3], "#task3_scatter_matrix_all_data_div_id")
-      scatter_matrix_plot("scatter matrix", scatterplot_matrix_top3_attributes_sampled_data, top3_attributes_sampled_data_ls, "", "", "", my_colors[4], [0, 1.3], "#task3_scatter_matrix_sampled_data_div_id")
-
-      // ===================== scree_plot -- start =====================
-      function scree_plot(data, title, color){
-
-          // Scale the range of the data
-          // Apply margin convention
-          var scree_svg_margin = {top: 50, right: 50, bottom: 50, left: 50},
-              scree_svg_width = window.innerWidth - scree_svg_margin.left - scree_svg_margin.right,
-              scree_svg_height = 300;
-              scree_svg_x_axis_height = 210;
-              // height = window.innerHeight - margin.top - margin.bottom;
-
-          // Use the index as X scale
-          var x_scale = d3.scaleLinear()
-              .domain([0, data.length-1])
-              .range([0, width]);
-
-          // Use data value as Y scale
-          var yScale = d3.scaleLinear()
-              .domain([0, d3.max(data) + 0.1])
-              .range([height, 0]);
-
-          // generate lines
-          var line = d3.line()
-              .x(function(d, i) { return x_scale(i); })
-              .y(function(d) { return y_scale(d.y); })
-
-          // generate line data y->data_value
-          var line_data = data.map(function(d) { return {"y": d} })
-          // console.log(line_data)
-
-          var scree_svg = d3.select("#task2_scree_div_id").append("svg")
-                      .attr("width", scree_svg_width + scree_svg_margin.left + scree_svg_margin.right)
-                      .attr("height", scree_svg_height)
-                      .on("mouseover", function() {
-                          d3.select(this).transition()
-                              .duration(100)
-                              .style("opacity", 1);})
-                      .on("mouseout", function() {
-                          d3.select(this).transition()
-                              .duration(400)
-                              .style("opacity", 0.3);})
-                      .append("g")
-                          .attr("transform",
-                                "translate(" + (scree_svg_margin.left + (scree_svg_width / 3.5)) + "," +
-                                                scree_svg_margin.top + ")")
-
-          // Append x axis
-          scree_svg.append("g")
-              .attr("class", "x axis")
-              .attr("transform", "translate(0," + scree_svg_height + ")")
-              .call(d3.axisBottom(x_scale))
-              .attr("transform", "translate(" + 0+ "," + scree_svg_x_axis_height + ")");
-
-          // Append y axis
-          scree_svg.append("g")
-              .attr("class", "y axis")
-              .call(d3.axisLeft(y_scale));
-
-          // Append text to x axis
-          scree_svg.append("text")
-              .attr("class", "x axis")
-              .attr("transform",
-                    "translate(" + (scree_svg_margin.left + 220) + " ," +
-                              (scree_svg_x_axis_height + 30) + ")")
-                   .style("text-anchor", "middle")
-                   .text("Principal Component")
-
-          // Append text to y axis
-          scree_svg.append("text")
-              .attr("class", "y axis")
-              .attr("transform",
-                    "translate(" + (scree_svg_margin.left - 140) + " ," +
-                              (scree_svg_x_axis_height - 110) + ")")
-                    .style("text-anchor", "middle")
-                    .text("Variance Ratio")
-
-          // Append title
-          scree_svg.append("text")
-                .attr("class", "title")
-                .attr("x", width / 2)
-                .attr("y", 0 - (scree_svg_margin.top / 2))
-                .attr("text-anchor", "middle")
-                .attr("font-size", "150%")
-                .text(title);
-
-          // Append paths
-          scree_svg.append("path")
-              .datum(line_data) // bind data to lines
-              .attr("d", line)
-              .attr("class", "line")
-
-          scree_svg.selectAll(".line")
-              .attr("stroke", color);
-
-          // Append a dot on each datapoint
-          scree_svg.selectAll(".dot")
-              .data(line_data)
-              .enter().append("circle")
-                  .attr("cx", function(d, i) { return x_scale(i) })
-                  .attr("cy", function(d) { return y_scale(d.y) })
-                  .attr("class", "dot")
-                  .attr("r", 6);
-
+          $.post("", {}, function(data){
+            console.log("Post request, please wait for a few minutes to compute and visualize the data.")
+            data = JSON.parse(data);
+            vis_data = data;
+            update_data(vis_data);
+          });
       }
-      // ===================== scree_plot -- end =====================
+      // ===================== post_new_request -- end =====================
 
-      // ===================== scatter_plot -- start =====================
-      function scatter_plot(plot_type, data, title, x_axis_text, y_axis_text, color, domain, pos, div_id){
+      // ===================== update_data -- start =====================
+      // ** Update data section (Called from the onclick)
+      function update_data(vis_data) {
 
-          var scatter_svg_margin = {},
-              width = 0,
-              height = 0;
+        // Remove the previous elements
+        d3.selectAll(".remove").remove();
 
-          if (plot_type == "scatter") {
-              // non scatter matrix
-              scatter_svg_margin = {top: 50, right: 50, bottom: 50, left: 50};
-              width = 500 - scatter_svg_margin.left - scatter_svg_margin.right;
-              height = 500 - scatter_svg_margin.top - scatter_svg_margin.bottom;
-          } else if (plot_type == "scatter matrix") {
-              // scatter matrix
-              scatter_svg_margin = {top: 20, right: 20, bottom: 20, left: 20};
-              width = (window.innerWidth / 4) - scatter_svg_margin.left - scatter_svg_margin.right + 3;
-              height = (window.innerWidth / 4) - scatter_svg_margin.top - scatter_svg_margin.bottom;
-          }
+        // ###########################################################################
+        // ####                Visualize Data from Backent                        ####
+        // ###########################################################################
+        console.log(vis_data);
+        console.log(vis_data.pca_all_data_explained_variance_ratio_);
+        console.log(vis_data.pca_sampled_data_explained_variance_ratio_);
+        console.log(vis_data.pca_ss_data_explained_variance_ratio_);
 
-          var x = d3.scaleLinear()
-                    .range([0, width]);
-          var y = d3.scaleLinear()
-                    .range([height, 0]);
+        // ###########################################################################
+        // ####               Initialize Canvas parameters                        ####
+        // ###########################################################################
+        var curr_bar_w = -10; // initial value
+        var max_bar_w = 70, min_bar_w = 10;
+        var w = window.innerWidth, h = window.innerHeight - 450;
+        var canvas_w = w - 20, canvas_h = h - 320;
+        var my_colors = ["#58A437", "#391C54", "#24446A", "#143933", "#311D11"];
 
-          var x_axis = d3.axisBottom(x);
-          var y_axis = d3.axisLeft(y);
+        // canvas
+        // main area to display all different kinds of charts
+        var canvas = d3.select("#canvas")
+                        .append("svg")
+                        .attr("class", "remove")
+                        .attr("width", canvas_w)
+                        .attr("height", canvas_h);
 
-          var x_axis_y = height / 2,
-              y_axis_x = width / 2,
-              x_axis_text_x = scatter_svg_margin.left + width - 70,
-              x_axis_text_y = height / 2 + 30,
-              y_axis_text_x = width / 2,
-              y_axis_text_y = -18;
+        // Code base from TA
+        // Set the dimensions of the canvas / graph
+        var margin = {top: 30, right: 20, bottom: 30, left: 50},
+                      width = 600 - margin.left - margin.right,
+                      height = 270 - margin.top - margin.bottom;
 
+        // Set the ranges
+        var x_scale = d3.scaleLinear().range([0, width]);
+        var y_scale = d3.scaleLinear().range([height, 0]);
 
-          if (plot_type == "scatter matrix") {
-              x_axis_y = height;
-              y_axis_x = 0;
-              x_axis_text_x = width - 40,
-              x_axis_text_y = height - 8,
-              y_axis_text_x = 45,
-              y_axis_text_y = 3;
-          }
+        // scree plot
+        scree_plot(vis_data.pca_all_data_explained_variance_ratio_, "All Data", my_colors[0]);
+        scree_plot(vis_data.pca_sampled_data_explained_variance_ratio_, "Sampled Data", my_colors[1])
+        scree_plot(vis_data.pca_ss_data_explained_variance_ratio_, "Stratified Sampled Data", my_colors[2]);
 
-          var scatter_svg = d3.select(div_id).append("svg")
-              .attr("width", width + scatter_svg_margin.left + scatter_svg_margin.right)
-              .attr("height", height + scatter_svg_margin.top + scatter_svg_margin.bottom)
-              .on("mouseover", function() {
-                  d3.select(this).transition()
-                      .duration(100)
-                      .style("opacity", 1);})
-              .on("mouseout", function() {
-                  d3.select(this).transition()
-                      .duration(400)
-                      .style("opacity", 0.5);})
-                .append("g")
-                  .attr("transform", "translate(" + (scatter_svg_margin.left + 3) + "," + scatter_svg_margin.top + ")");
+        // Task3 scatter plot
+        var pos = {i:0, n_i:0, j:0, n_j:0}; // position of the scatterplot in scatterplot matrix. All zeros means one scatter plot, not for scatter plot matrix.
+        scatter_plot("scatter", vis_data.top2PACVectors_all_data_t, "Top 2 PCA Vectors: All Data", "Component0", "Component1", my_colors[0], [-2, 2], pos, "#task3_scatter_div_id");
+        scatter_plot("scatter", vis_data.top2PACVectors_sampled_data_t, "Top 2 PCA Vectors: Sampled Data", "Component0", "Component1", my_colors[0], [-2, 2], pos, "#task3_scatter_div_id");
+        // scatter_plot("scatter", vis_data.top2PACVectors_ss_data_t, "Top 2 PCA Vectors: Stratified Sampled Data", my_colors[2]);
 
-            x.domain(domain)
-            y.domain(domain)
+        // Task3 visualize the data via MDS (Euclidian & correlation distance) in 2D scatterplots
+        scatter_plot("scatter", vis_data.embedding_MDS_all_data_euclidean_t, "MDS (Euclidian): All Data", "Component0", "Component1", my_colors[1], [-2, 2], pos, "#task3_scatter_div_id");
+        scatter_plot("scatter", vis_data.embedding_MDS_sampled_data_euclidean_t, "MDS (Euclidian): Sampled Data", "Component0", "Component1", my_colors[1], [-2, 2], pos, "#task3_scatter_div_id");
+        scatter_plot("scatter", vis_data.embedding_MDS_all_data_correlation_t, "MDS (Correlation): All Data", "Component0", "Component1", my_colors[2], [-0.5, 0.5], pos, "#task3_scatter_div_id");
+        scatter_plot("scatter", vis_data.embedding_MDS_sampled_data_correlation_t, "MDS (Correlation): Sampled Data", "Component0", "Component1", my_colors[2], [-0.5, 0.5], pos, "#task3_scatter_div_id");
+
+        // Task3 visualize scatterplot matrix of the three highest PCA loaded attributes
+        var scatterplot_matrix_top3_attributes_all_data = vis_data.scatterplot_matrix_top3_attributes_all_data;         // shape (9, n_sample, n_attributes) -- (9, 777, 2)
+        var top3_attributes_all_data_ls = vis_data.top3_attributes_all_data_ls; // list of top 3 attributes names
+        var scatterplot_matrix_top3_attributes_sampled_data = vis_data.scatterplot_matrix_top3_attributes_sampled_data; // shape (9, n_sample, n_attributes) -- (9, 388, 2)
+        var top3_attributes_sampled_data_ls = vis_data.top3_attributes_sampled_data_ls; // list of top 3 attributes names
+        scatter_matrix_plot("scatter matrix", scatterplot_matrix_top3_attributes_all_data, top3_attributes_all_data_ls, "", "", "", my_colors[3], [0, 1.3], "#task3_scatter_matrix_all_data_div_id")
+        scatter_matrix_plot("scatter matrix", scatterplot_matrix_top3_attributes_sampled_data, top3_attributes_sampled_data_ls, "", "", "", my_colors[4], [0, 1.3], "#task3_scatter_matrix_sampled_data_div_id")
+
+        // ###########################################################################
+        // ####                           Plot Functions                          ####
+        // ###########################################################################
+        // ===================== scree_plot -- start =====================
+        function scree_plot(data, title, color){
+
+            // Scale the range of the data
+            // Apply margin convention
+            var scree_svg_margin = {top: 50, right: 50, bottom: 50, left: 50},
+                scree_svg_width = window.innerWidth - scree_svg_margin.left - scree_svg_margin.right,
+                scree_svg_height = 300;
+                scree_svg_x_axis_height = 210;
+                // height = window.innerHeight - margin.top - margin.bottom;
+
+            // Use the index as X scale
+            var x_scale = d3.scaleLinear()
+                .domain([0, data.length-1])
+                .range([0, width]);
+
+            // Use data value as Y scale
+            var yScale = d3.scaleLinear()
+                .domain([0, d3.max(data) + 0.1])
+                .range([height, 0]);
+
+            // generate lines
+            var line = d3.line()
+                .x(function(d, i) { return x_scale(i); })
+                .y(function(d) { return y_scale(d.y); })
+
+            // generate line data y->data_value
+            var line_data = data.map(function(d) { return {"y": d} })
+            // console.log(line_data)
+
+            var scree_svg = d3.select("#task2_scree_div_id").append("svg")
+                        .attr("class", "remove")
+                        .attr("width", scree_svg_width + scree_svg_margin.left + scree_svg_margin.right)
+                        .attr("height", scree_svg_height)
+                        .on("mouseover", function() {
+                            d3.select(this).transition()
+                                .duration(100)
+                                .style("opacity", 1);})
+                        .on("mouseout", function() {
+                            d3.select(this).transition()
+                                .duration(400)
+                                .style("opacity", 0.3);})
+                        .append("g")
+                            .attr("transform",
+                                  "translate(" + (scree_svg_margin.left + (scree_svg_width / 3.5)) + "," +
+                                                  scree_svg_margin.top + ")")
 
             // Append x axis
-            scatter_svg.append("g")
-                  .attr("class", "x axis")
-                  .attr("transform", "translate(0," + x_axis_y + ")") // center of the plot
-                  .call(x_axis);
+            scree_svg.append("g")
+                .attr("class", "x_axis remove")
+                .attr("transform", "translate(0," + scree_svg_height + ")")
+                .call(d3.axisBottom(x_scale))
+                .attr("transform", "translate(" + 0+ "," + scree_svg_x_axis_height + ")");
 
             // Append y axis
-            scatter_svg.append("g")
-                  .attr("class", "y axis")
-                  .attr("transform", "translate(" + y_axis_x + ",0)") // center of the plot
-                  .call(y_axis);
-
-
+            scree_svg.append("g")
+                .attr("class", "y_axis remove")
+                .call(d3.axisLeft(y_scale));
 
             // Append text to x axis
-            scatter_svg.append("text")
-                    .attr("class", "x axis")
-                    .attr("transform",
-                          "translate(" + x_axis_text_x + " ," +
-                                    x_axis_text_y + ")")
-                          .style("text-anchor", "middle")
-                          .text(x_axis_text)
+            scree_svg.append("text")
+                .attr("class", "x_axis remove")
+                .attr("transform",
+                      "translate(" + (scree_svg_margin.left + 220) + " ," +
+                                (scree_svg_x_axis_height + 30) + ")")
+                     .style("text-anchor", "middle")
+                     .text("Principal Component")
 
             // Append text to y axis
-            scatter_svg.append("text")
-                      .attr("class", "y axis")
-                      .attr("transform",
-                            "translate(" + y_axis_text_x + " ," +
-                                      y_axis_text_y + ")")
-                            .style("text-anchor", "middle")
-                            .text(y_axis_text)
+            scree_svg.append("text")
+                .attr("class", "y_axis remove")
+                .attr("transform",
+                      "translate(" + (scree_svg_margin.left - 140) + " ," +
+                                (scree_svg_x_axis_height - 110) + ")")
+                      .style("text-anchor", "middle")
+                      .text("Variance Ratio")
 
             // Append title
-            scatter_svg.append("text")
-                        .attr("class", "title")
-                        .attr("x", width / 2)
-                        .attr("y", height + 30)
-                        .attr("text-anchor", "middle")
-                        .attr("font-size", "150%")
-                        .text(title);
+            scree_svg.append("text")
+                  .attr("class", "title remove")
+                  .attr("x", width / 2)
+                  .attr("y", 0 - (scree_svg_margin.top / 2))
+                  .attr("text-anchor", "middle")
+                  .attr("font-size", "150%")
+                  .text(title);
 
-            // Append data dots
-            scatter_svg.selectAll(".dot")
-                  .data(data)
-                  .enter().append("circle")
-                    .attr("cx", function(d) { return x(d[0]); })
-                    .attr("cy", function(d) { return y(d[1]); })
-                    .attr("class", "dot")
-                    .attr("r", 3.5)
-                    .attr("fill", color);
+            // Append paths
+            scree_svg.append("path")
+                .datum(line_data) // bind data to lines
+                .attr("d", line)
+                .attr("class", "line remove")
+
+            scree_svg.selectAll(".line")
+                .attr("stroke", color);
+
+            // Append a dot on each datapoint
+            scree_svg.selectAll(".dot")
+                .data(line_data)
+                .enter().append("circle")
+                    .attr("cx", function(d, i) { return x_scale(i) })
+                    .attr("cy", function(d) { return y_scale(d.y) })
+                    .attr("class", "dot remove")
+                    .attr("r", 6);
+
+        }
+        // ===================== scree_plot -- end =====================
+
+        // ===================== scatter_plot -- start =====================
+        function scatter_plot(plot_type, data, title, x_axis_text, y_axis_text, color, domain, pos, div_id){
+
+            var scatter_svg_margin = {},
+                width = 0,
+                height = 0;
+
+            if (plot_type == "scatter") {
+                // non scatter matrix
+                scatter_svg_margin = {top: 50, right: 50, bottom: 50, left: 50};
+                width = 500 - scatter_svg_margin.left - scatter_svg_margin.right;
+                height = 500 - scatter_svg_margin.top - scatter_svg_margin.bottom;
+            } else if (plot_type == "scatter matrix") {
+                // scatter matrix
+                scatter_svg_margin = {top: 20, right: 20, bottom: 20, left: 20};
+                width = (window.innerWidth / 4) - scatter_svg_margin.left - scatter_svg_margin.right + 3;
+                height = (window.innerWidth / 4) - scatter_svg_margin.top - scatter_svg_margin.bottom;
+            }
+
+            var x = d3.scaleLinear()
+                      .range([0, width]);
+            var y = d3.scaleLinear()
+                      .range([height, 0]);
+
+            var x_axis = d3.axisBottom(x);
+            var y_axis = d3.axisLeft(y);
+
+            var x_axis_y = height / 2,
+                y_axis_x = width / 2,
+                x_axis_text_x = scatter_svg_margin.left + width - 70,
+                x_axis_text_y = height / 2 + 30,
+                y_axis_text_x = width / 2,
+                y_axis_text_y = -18;
+
+
+            if (plot_type == "scatter matrix") {
+                x_axis_y = height;
+                y_axis_x = 0;
+                x_axis_text_x = width - 40,
+                x_axis_text_y = height - 8,
+                y_axis_text_x = 45,
+                y_axis_text_y = 3;
+            }
+
+            var scatter_svg = d3.select(div_id).append("svg")
+                .attr("width", width + scatter_svg_margin.left + scatter_svg_margin.right)
+                .attr("height", height + scatter_svg_margin.top + scatter_svg_margin.bottom)
+                .attr("class", "remove")
+                .on("mouseover", function() {
+                    d3.select(this).transition()
+                        .duration(100)
+                        .style("opacity", 1);})
+                .on("mouseout", function() {
+                    d3.select(this).transition()
+                        .duration(400)
+                        .style("opacity", 0.5);})
+                  .append("g")
+                    .attr("transform", "translate(" + (scatter_svg_margin.left + 3) + "," + scatter_svg_margin.top + ")");
+
+              x.domain(domain)
+              y.domain(domain)
+
+              // Append x axis
+              scatter_svg.append("g")
+                    .attr("class", "x_axis remove")
+                    .attr("transform", "translate(0," + x_axis_y + ")") // center of the plot
+                    .call(x_axis);
+
+              // Append y axis
+              scatter_svg.append("g")
+                    .attr("class", "y_axis remove")
+                    .attr("transform", "translate(" + y_axis_x + ",0)") // center of the plot
+                    .call(y_axis);
+
+
+
+              // Append text to x axis
+              scatter_svg.append("text")
+                      .attr("class", "x_axis remove")
+                      .attr("transform",
+                            "translate(" + x_axis_text_x + " ," +
+                                      x_axis_text_y + ")")
+                            .style("text-anchor", "middle")
+                            .text(x_axis_text)
+
+              // Append text to y axis
+              scatter_svg.append("text")
+                        .attr("class", "y_axis remove")
+                        .attr("transform",
+                              "translate(" + y_axis_text_x + " ," +
+                                        y_axis_text_y + ")")
+                              .style("text-anchor", "middle")
+                              .text(y_axis_text)
+
+              // Append title
+              scatter_svg.append("text")
+                          .attr("class", "title remove")
+                          .attr("x", width / 2)
+                          .attr("y", height + 30)
+                          .attr("text-anchor", "middle")
+                          .attr("font-size", "150%")
+                          .text(title);
+
+              // Append data dots
+              scatter_svg.selectAll(".dot")
+                    .data(data)
+                    .enter().append("circle")
+                      .attr("cx", function(d) { return x(d[0]); })
+                      .attr("cy", function(d) { return y(d[1]); })
+                      .attr("class", "dot remove")
+                      .attr("r", 3.5)
+                      .attr("fill", color);
+
+        }
+        // ===================== scatter_plot -- end =====================
+
+        // ===================== scatter_matrix_plot -- start =====================
+        function scatter_matrix_plot(plot_type, data, top3_attributes_ls, title, x_axis_text, y_axis_text, color, domain, div_id){
+
+            var pos = {i:0, n_i:0, j:0, n_j:0};
+            // data should be in shape of (9, n_sample, 2)
+            for (var ii = 0; ii < 3; ++ii) {
+                for (var jj = 0; jj < 3; ++jj) {
+                    y_axis_text = top3_attributes_ls[ii];
+                    x_axis_text = top3_attributes_ls[2 - jj];
+                    scatter_plot(plot_type, data[ii * 3 + jj], title, x_axis_text, y_axis_text, color, domain, pos, div_id)
+                }
+            }
+
+        }
+        // ===================== scatter_matrix_plot -- end =====================
 
       }
-      // ===================== scatter_plot -- end =====================
+      // ===================== update_data -- start =====================
 
-      // ===================== scatter_matrix_plot -- start =====================
-      function scatter_matrix_plot(plot_type, data, top3_attributes_ls, title, x_axis_text, y_axis_text, color, domain, div_id){
-
-          var pos = {i:0, n_i:0, j:0, n_j:0};
-          // data should be in shape of (9, n_sample, 2)
-          for (var ii = 0; ii < 3; ++ii) {
-              for (var jj = 0; jj < 3; ++jj) {
-                  y_axis_text = top3_attributes_ls[ii];
-                  x_axis_text = top3_attributes_ls[2 - jj];
-                  scatter_plot(plot_type, data[ii * 3 + jj], title, x_axis_text, y_axis_text, color, domain, pos, div_id)
-              }
-          }
-
-      }
-      // ===================== scatter_matrix_plot -- end =====================
+      // ###########################################################################
+      // ####    Visualization Starts here when index.html is first loaded      ####
+      // ###########################################################################
+      update_data(vis_data);
 
     </script>
 </div>

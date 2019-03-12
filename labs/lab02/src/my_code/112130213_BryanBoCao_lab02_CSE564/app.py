@@ -32,11 +32,14 @@ from sklearn.manifold import MDS
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
 app = Flask(__name__)
 
 @app.route("/", methods = ['POST', 'GET'])
 def index():
+
+    print("====== index.html backend computing starts ===================================")
 
     global df
     df_all_data = df[['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
@@ -63,12 +66,12 @@ def index():
     	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate']
 
     # =================== random sampling ====================
-    # df_sampled_data = random_sampling(df_all_data)
-    df_sampled_data_normalized = random_sampling(df_all_data_normalized)
+    # df_sampled_data = random_sample(df_all_data)
+    df_sampled_data_normalized = random_sample(df_all_data_normalized)
 
     # ================= stratified sampling ==================
-    # df_ss_data = stratified_sampling(df_all_data)
-    df_ss_data_normalized = stratified_sampling(df_all_data_normalized)
+    # df_ss_data = stratified_sample(df_all_data)
+    df_ss_data_normalized = stratified_sample(df_all_data_normalized)
 
     # ======================== Task2 ========================
     # Task 2: dimension reduction (use decimated data) (30 points)
@@ -130,22 +133,30 @@ def index():
                 'top3_attributes_sampled_data_ls': top3_attributes_sampled_data_ls};
 
     # vis_data = jsonify(vis_data) # Should be a json string
-    return render_template("index.html", data=vis_data)
+    print("====== index.html backend computing ends ===================================")
+    print("Visualizing data in the frontend...")
+    if request.method == 'POST':
+        vis_data = json.dumps(vis_data, indent=2)
+        return jsonify(vis_data)
+    else:
+        return render_template("index.html", data=vis_data)
 # =================== def index() -- end ===================
 
-# =================== random sampling -- start ====================
-def random_sampling(df_all_data):
+# =================== random sample -- start ====================
+def random_sample(df_all_data):
+    print("Random Sampling...")
     total_n_sample = int(len(df_all_data) / 2) # sample half of the data
-    df_sampled_data = df_all_data.sample(n=total_n_sample)
+    df_sampled_data = df_all_data.sample(n=total_n_sample, random_state=None)
     print("Number of instance in df_sampled_data: %d" % len(df_sampled_data))
     print("Number of dimension of df_sampled_data: %d" % len(df_sampled_data.columns))
     df_sampled_data.columns = ['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
     	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate']
     return df_sampled_data
-# =================== random sampling -- end =====================
+# =================== random sample -- end =====================
 
-# ================= stratified sampling -- start ==================
-def stratified_sampling(df_all_data):
+# ================= stratified sample -- start ==================
+def stratified_sample(df_all_data):
+    print("Stratified Sampling...")
     # optimize k using elbow
     distortions = []
     n_k = range(1,10)
@@ -211,7 +222,7 @@ def stratified_sampling(df_all_data):
     df_ss_data.columns = ['Apps','Accept','Enroll', 'Top10perc', 'Top25perc', 'F.Undergrad', 'P.Undergrad', 'Outstate',
     	       'Room.Board', 'Books', 'Personal', 'PhD', 'Terminal', 'S.F.Ratio', 'perc.alumni', 'Expend', 'Grad.Rate', 'Cluster']
     return df_ss_data
-# ================= stratified sampling -- end ==================
+# ================= stratified sample -- end ==================
 
 # ================= myPCA -- start ==================
 def myPCA(df_data, data_type):
@@ -270,6 +281,7 @@ def top2PCAVectors(df_data, data_type):
 
 # ================= MDS -- start ====================
 def myMDS(data, dissimilarity, data_type):
+    print("Computing MDS data matrix... Please wait.")
     if (dissimilarity == "euclidean"):
         embedding = MDS(n_components=2, dissimilarity="euclidean")
         embedding_MDS_data_t = embedding.fit_transform(data)
