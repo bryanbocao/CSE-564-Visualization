@@ -101,8 +101,10 @@ def index():
     # ================= MDS -- start ====================
     embedding_MDS_all_data_euclidean_t = my_MDS(df_all_data_normalized, "euclidean", "All Data")
     embedding_MDS_sampled_data_euclidean_t = my_MDS(df_sampled_data_normalized, "euclidean", "Sampled Data")
+    embedding_MDS_ss_data_euclidean_t = my_MDS(df_ss_data_normalized, "euclidean", "Sampled Data")
     embedding_MDS_all_data_correlation_t = my_MDS(df_all_data_normalized, "correlation", "All Data")
     embedding_MDS_sampled_data_correlation_t = my_MDS(df_sampled_data_normalized, "correlation", "Sampled Data")
+    embedding_MDS_ss_data_correlation_t = my_MDS(df_ss_data_normalized, "correlation", "Sampled Data")
     # ================= MDS -- end ====================
 
     # ================= Scatter Plot Matrix -- start ====================
@@ -110,6 +112,8 @@ def index():
         compute_scatterplot_matrix(df_all_data_normalized, top3_attributes_i_all_data_ls)               # shape (9, n_sample, n_attributes) -- (9, 777, 3)
     scatterplot_matrix_top3_attributes_sampled_data, top3_attributes_sampled_data_ls = \
         compute_scatterplot_matrix(df_sampled_data_normalized, top3_attributes_i_sampled_data_ls)   # shape (9, n_sample, n_attributes) -- (9, 388, 3)
+    scatterplot_matrix_top3_attributes_ss_data, top3_attributes_ss_data_ls = \
+        compute_scatterplot_matrix(df_ss_data_normalized, top3_attributes_i_ss_data_ls)   # shape (9, n_sample, n_attributes) -- (9, 388, 3)
     # ================= Scatter Plot Matrix -- end ====================
 
     # ========= Jsonify Data for Visualization in the Frontend =================
@@ -125,12 +129,16 @@ def index():
                 'top2PACVectors_ss_data_t': top2PACVectors_ss_data_t,
                 'embedding_MDS_all_data_euclidean_t': embedding_MDS_all_data_euclidean_t,
                 'embedding_MDS_sampled_data_euclidean_t': embedding_MDS_sampled_data_euclidean_t,
+                'embedding_MDS_ss_data_euclidean_t': embedding_MDS_ss_data_euclidean_t,
                 'embedding_MDS_all_data_correlation_t': embedding_MDS_all_data_correlation_t,
                 'embedding_MDS_sampled_data_correlation_t': embedding_MDS_sampled_data_correlation_t,
+                'embedding_MDS_ss_data_correlation_t': embedding_MDS_ss_data_correlation_t,
                 'scatterplot_matrix_top3_attributes_all_data': scatterplot_matrix_top3_attributes_all_data,
                 'top3_attributes_all_data_ls': top3_attributes_all_data_ls,
                 'scatterplot_matrix_top3_attributes_sampled_data': scatterplot_matrix_top3_attributes_sampled_data,
-                'top3_attributes_sampled_data_ls': top3_attributes_sampled_data_ls};
+                'top3_attributes_sampled_data_ls': top3_attributes_sampled_data_ls,
+                'scatterplot_matrix_top3_attributes_ss_data': scatterplot_matrix_top3_attributes_ss_data,
+                'top3_attributes_ss_data_ls': top3_attributes_ss_data_ls};
 
     # vis_data = jsonify(vis_data) # Should be a json string
     print("====== index.html backend computing ends ===================================")
