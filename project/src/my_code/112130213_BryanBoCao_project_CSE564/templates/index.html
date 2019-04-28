@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<!--
+Student: Bryan Bo Cao
+SBU ID: 112130213
+Email: bo.cao.1@stonybrook.edu or boccao@cs.stonybrook.edu
+
+Reference:
+https://getbootstrap.com/docs
+https://www.w3schools.com
+Flask code base from TA: https://github.com/hawkeye154/d3_flask_tutorial
+https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
+https://color.hailpixel.com/#58A437,391C54,6ACDCC,24446A
+-->
+<html lang="en">
+<head>
+    <!--  <script src="../d3.min.js"></script> Use D3 library from CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <style>
+      #value_on_bar {
+        font-size: 20px;
+        background-color: #66A5AD;
+        padding: .30em;
+        color: white;
+        border-radius: 6px;
+        pointer-events: none;
+        position: absolute;
+      }
+
+      hr {
+        border: 3;
+        border-top: 3px solid #66A5AD;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      text {
+        font-family: sans-serif;
+        font-size: 10px;
+      }
+
+      .line {
+          fill: none;
+          stroke-width: 5;
+      }
+
+      .overlay {
+          fill: #07575B;
+          pointer-events: all;
+      }
+
+      .dot {
+          fill-opacity: .5;
+      }
+
+      .elbow_dot {
+          fill-opacity: .8;
+          fill: #DC143C;
+      }
+
+      .x_axis {
+          font-size: 18px;
+      }
+
+      .y_axis {
+          font-size: 18px;
+      }
+
+      .title {
+          font-size: 20px;
+          background-color: #66A5AD;
+      }
+
+      .label {
+          font-size: 18px;
+          background-color: #66A5AD;
+      }
+    </style>
+    <!-- load the d3.js library -->
+    <script src="http://d3js.org/d3.v5.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+<div class="page-header" align="center">
+  <div id="bar_div" style="background-color: #24446A;" width="960" height="80" class="well">
+    <font color="white"><h4>Student: Bryan Bo Cao SBU ID: 112130213</h4></font>
+  </div>
+</div>
+
+<div class="container-fluid well">
+  <div id="canvas">
+
+  </div>
+</div><!-- end of <div class="container-fluid well"> -->
+
+<div id="canvas_script">
+  <script>
+
+
+  </script>
+</div>
+</body>
+</html>
